@@ -1,6 +1,6 @@
 # fake-ai-api
 
-一个恶搞用的假 AI 服务，接口兼容 OpenAI / Anthropic，可部署到 Vercel。
+一个恶搞用的假 AI 服务，接口兼容 OpenAI / Anthropic，可部署到 Vercel 或 Cloudflare Workers。
 
 模型列表与鉴权均为真实实现，但任何请求的回答都是 `ascii.txt` 的内容。支持流式输出，用于模拟 LLM 打字效果。
 
@@ -21,6 +21,24 @@ node server.js
 ```bash
 npm i -g vercel
 vercel --prod
+```
+
+## 部署到 Cloudflare Workers
+
+入口是 `worker.js`，与 Vercel 共用 `lib/handler.js` 的路由逻辑，请求路径体验完全一致（`/v1/chat/completions` 等路径直接可用，无需 rewrite）。
+
+```bash
+npm install        # 安装 wrangler（devDependency）
+npm run dev:cf     # 本地 workerd 调试，默认 http://localhost:8787
+npm run deploy:cf  # 部署到 Cloudflare
+```
+
+`ascii.txt` / `index.html` / `robots.txt` / `sitemap.xml` 通过 `wrangler.toml` 的 Text rules 打包进 Worker；Node 侧（Vercel、本地）仍用 `fs` 读，见 `lib/runtime-node.js`。
+
+API Key 不写死在 `config.js` 的话，用 secret 配置（对应环境变量 `FAKE_API_KEY`）：
+
+```bash
+npx wrangler secret put FAKE_API_KEY
 ```
 
 ## 配置
