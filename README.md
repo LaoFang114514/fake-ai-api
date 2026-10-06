@@ -25,6 +25,8 @@ vercel --prod
 
 ## 部署到 Cloudflare Workers
 
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/XTxiaoting14332/fake-ai-api)
+
 入口是 `worker.js`，与 Vercel 共用 `lib/handler.js` 的路由逻辑，请求路径体验完全一致（`/v1/chat/completions` 等路径直接可用，无需 rewrite）。
 
 ```bash
