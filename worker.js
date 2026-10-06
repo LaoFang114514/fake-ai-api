@@ -2,7 +2,7 @@
 // 把 Fetch API 的 Request 适配成 lib/handler.js 期望的 Node 风格 req/res，
 // 与 Vercel（api/*.js）和本地（server.js）共用同一份路由逻辑。
 import { createHandler } from "./lib/handler";
-import ASCII from "./ascii.txt";
+import ASCII_LIST from "./ascii/manifest.js";
 import INDEX_HTML from "./index.html";
 import ROBOTS_TXT from "./robots.txt";
 import SITEMAP_XML from "./sitemap.xml";
@@ -13,7 +13,7 @@ function getHandler(env) {
   if (!handler) {
     handler = createHandler({
       assets: {
-        ascii: ASCII,
+        asciiList: ASCII_LIST,
         indexHtml: INDEX_HTML,
         robotsTxt: ROBOTS_TXT,
         sitemapXml: SITEMAP_XML,

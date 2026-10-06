@@ -2,7 +2,7 @@
 
 一个恶搞用的假 AI 服务，接口兼容 OpenAI / Anthropic，可部署到 Vercel 或 Cloudflare Workers。
 
-模型列表与鉴权均为真实实现，但任何请求的回答都是 `ascii.txt` 的内容。支持流式输出，用于模拟 LLM 打字效果。
+模型列表与鉴权均为真实实现，但任何请求的回答都是 `ascii/` 目录里随机一份字符画的内容。支持流式输出，用于模拟 LLM 打字效果。
 
 ## 本地运行
 
@@ -35,13 +35,25 @@ npm run dev:cf     # 本地 workerd 调试，默认 http://localhost:8787
 npm run deploy:cf  # 部署到 Cloudflare
 ```
 
-`ascii.txt` / `index.html` / `robots.txt` / `sitemap.xml` 通过 `wrangler.toml` 的 Text rules 打包进 Worker；Node 侧（Vercel、本地）仍用 `fs` 读，见 `lib/runtime-node.js`。
+`ascii/` / `index.html` / `robots.txt` / `sitemap.xml` 通过 `wrangler.toml` 的 Text rules 打包进 Worker（字符画走 `ascii/manifest.js` 静态导入）；Node 侧（Vercel、本地）仍用 `fs` 读，见 `lib/runtime-node.js`。
 
 API Key 不写死在 `config.js` 的话，用 secret 配置（对应环境变量 `FAKE_API_KEY`）：
 
 ```bash
 npx wrangler secret put FAKE_API_KEY
 ```
+
+## 字符画
+
+`ascii/` 下每份 `*.txt` 都是一份回答内容，每次请求随机挑一份。
+
+新增文件后需要重新生成 Workers 侧的静态导入清单：
+
+```bash
+npm run build:ascii   # 生成 ascii/manifest.js
+```
+
+`npm run dev:cf` / `deploy:cf` 会自动先跑这一步。Vercel 与本地直接 `fs.readdirSync` 读目录，不需要它。
 
 ## 配置
 

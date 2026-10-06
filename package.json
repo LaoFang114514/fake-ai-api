@@ -2,13 +2,14 @@
   "name": "fake-ai-api",
   "version": "1.0.0",
   "private": true,
-  "description": "恶搞用 Fake AI API：兼容 OpenAI / Anthropic 接口，永远只返回 ascii.txt 的内容（支持流式打字机效果）。",
+  "description": "恶搞用 Fake AI API：兼容 OpenAI / Anthropic 接口，永远只返回 ascii/ 里随机一份字符画的内容（支持流式打字机效果）。",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "dev:cf": "wrangler dev",
-    "deploy:cf": "wrangler deploy"
+    "build:ascii": "node scripts/gen-ascii-manifest.js",
+    "dev:cf": "node scripts/gen-ascii-manifest.js && wrangler dev",
+    "deploy:cf": "node scripts/gen-ascii-manifest.js && wrangler deploy"
   },
   "devDependencies": {
     "wrangler": "4.142.0"
