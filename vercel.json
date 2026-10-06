@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "api/*.js": {
+      "includeFiles": "{ascii.txt,index.html,robots.txt,sitemap.xml}"
+    }
+  },
   "rewrites": [
     {
       "source": "/((?!api).*)",
