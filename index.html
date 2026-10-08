@@ -1,276 +1,246 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" class="mdui-theme-dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="renderer" content="webkit">
 <title>FkAPI - AI API 中转站</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@2.1.5/mdui.css"
+      onerror="this.onerror=null;this.href='https://registry.npmmirror.com/mdui/2.1.5/files/mdui.css'">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/material-icons@1.13.1/iconfont/material-icons.css"
+      onerror="this.onerror=null;this.href='https://fonts.googleapis.com/icon?family=Material+Icons+Outlined'">
+<script src="https://cdn.jsdelivr.net/npm/mdui@2.1.5/mdui.global.js"
+        onerror="this.onerror=null;this.src='https://registry.npmmirror.com/mdui/2.1.5/files/mdui.global.js'"></script>
+
 <style>
   :root {
-    --bg: #0b0f1a;
-    --card: #121828;
-    --border: #1f2a45;
-    --text: #e6ebf5;
-    --muted: #8b96ad;
-    --accent: #5b8cff;
-    --accent-2: #9d6bff;
+    --page-max: 1080px;
+    --bar-height: 64px;
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  /* mdui 未注册前不显示，避免弹窗内容裸露在页面底部 */
+  mdui-dialog:not(:defined) { display: none; }
+
   html { scroll-behavior: smooth; }
   body {
-    background: var(--bg);
-    color: var(--text);
     font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
     line-height: 1.6;
   }
-  a { color: var(--accent); text-decoration: none; }
-  .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  .container {
+    max-width: var(--page-max);
+    margin: 0 auto;
+    padding: 0 24px;
+  }
 
-  /* 顶部公告条 */
+  /* 公告条 */
   .banner {
-    background: linear-gradient(90deg, #1b2a55, #2a1b55);
-    color: #cfe0ff;
-    font-size: 13px;
-    text-align: center;
-    padding: 8px 16px;
-  }
-
-  /* 导航栏 */
-  header {
-    position: sticky;
-    top: 0;
-    background: rgba(11, 15, 26, 0.85);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border);
-    z-index: 10;
-  }
-  .nav {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    height: 62px;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px 16px;
+    font-size: 13px;
+    background: rgb(var(--mdui-color-primary-container));
+    color: rgb(var(--mdui-color-on-primary-container));
   }
-  .logo { display: flex; align-items: center; gap: 8px; font-size: 19px; font-weight: 700; }
+  .banner mdui-icon { font-size: 18px; }
+
+  /* 顶部应用栏 */
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 19px;
+    font-weight: 700;
+    color: rgb(var(--mdui-color-on-surface));
+  }
   .logo .mark {
-    width: 30px; height: 30px; border-radius: 8px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    width: 30px; height: 30px;
+    border-radius: var(--mdui-shape-corner-small);
+    background: linear-gradient(135deg, rgb(var(--mdui-color-primary)), rgb(var(--mdui-color-tertiary)));
     display: flex; align-items: center; justify-content: center;
-    color: #fff; font-size: 16px;
+    color: rgb(var(--mdui-color-on-primary));
   }
-  .nav-links { display: flex; gap: 26px; font-size: 14px; color: var(--muted); }
-  .nav-links a { color: var(--muted); }
-  .nav-links a:hover { color: var(--text); }
-  .nav-actions { display: flex; align-items: center; gap: 12px; }
-  .btn {
-    display: inline-block;
-    padding: 8px 18px;
-    border-radius: 8px;
+  .logo .mark mdui-icon { font-size: 18px; }
+  .nav-links { display: flex; align-items: center; gap: 4px; }
+  mdui-dropdown { display: none; }
+  mdui-menu:not(:defined) { display: none; }
+
+  /* 区块 */
+  section { padding: 64px 0; scroll-margin-top: calc(var(--bar-height) + 12px); }
+  .section-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: rgb(var(--mdui-color-on-surface));
+  }
+  .section-sub {
+    text-align: center;
     font-size: 14px;
-    cursor: pointer;
-    border: none;
-    transition: all .15s ease;
+    margin-bottom: 40px;
+    color: rgb(var(--mdui-color-on-surface-variant));
   }
-  .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
-  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    color: #fff;
-  }
-  .btn-primary:hover { filter: brightness(1.1); }
 
   /* 主视觉 */
-  .hero { text-align: center; padding: 88px 0 64px; }
+  .hero { text-align: center; padding: 80px 0 56px; }
   .hero h1 {
     font-size: 42px;
     font-weight: 800;
-    background: linear-gradient(90deg, #fff, var(--accent), var(--accent-2));
+    line-height: 1.2;
+    background: linear-gradient(90deg,
+      rgb(var(--mdui-color-on-surface)),
+      rgb(var(--mdui-color-primary-light)),
+      rgb(var(--mdui-color-tertiary)));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
-  .hero p { color: var(--muted); font-size: 17px; margin: 18px auto 34px; max-width: 640px; }
-  .hero .btns { display: flex; gap: 14px; justify-content: center; }
-  .hero .btn { padding: 12px 28px; font-size: 15px; }
+  .hero .lead {
+    font-size: 17px;
+    margin: 18px auto 26px;
+    max-width: 640px;
+    color: rgb(var(--mdui-color-on-surface-variant));
+  }
+  .hero .btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
   .base-url-box {
     display: inline-flex;
     align-items: center;
     gap: 12px;
-    margin-top: 22px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 8px 8px 8px 16px;
+    margin: 0 auto 26px;
+    padding: 6px 6px 6px 16px;
+    border-radius: var(--mdui-shape-corner-large);
+    background: rgb(var(--mdui-color-surface-container-high));
+    border: 1px solid rgb(var(--mdui-color-outline-variant));
   }
-  .base-url-label { font-size: 12px; color: var(--muted); letter-spacing: .5px; }
+  .base-url-label {
+    font-size: 12px;
+    letter-spacing: .5px;
+    color: rgb(var(--mdui-color-on-surface-variant));
+  }
   .base-url-box code {
     font-size: 14px;
-    color: var(--text);
+    color: rgb(var(--mdui-color-on-surface));
     font-family: "SF Mono", Consolas, Menlo, monospace;
   }
-  .btn-copy { padding: 6px 16px; font-size: 13px; }
-  .modal-mask {
-    position: fixed;
-    inset: 0;
-    background: rgba(8, 12, 22, .72);
-    backdrop-filter: blur(4px);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    padding: 20px;
-  }
-  .modal {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 36px 40px;
-    max-width: 420px;
-    width: 100%;
-    text-align: center;
-  }
-  .modal .modal-icon { font-size: 38px; margin-bottom: 14px; }
-  .modal h3 { font-size: 20px; margin-bottom: 12px; }
-  .modal p { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+
   .stats {
-    display: flex; justify-content: center; gap: 64px;
-    margin-top: 56px; flex-wrap: wrap;
+    display: flex; justify-content: center; gap: 56px;
+    margin-top: 48px; flex-wrap: wrap;
   }
-  .stats .num { font-size: 28px; font-weight: 700; color: var(--text); }
-  .stats .label { font-size: 13px; color: var(--muted); }
+  .stats .num {
+    font-size: 28px; font-weight: 700;
+    color: rgb(var(--mdui-color-primary));
+  }
+  .stats .label { font-size: 13px; color: rgb(var(--mdui-color-on-surface-variant)); }
 
-  /* 区块通用 */
-  section { padding: 64px 0; }
-  .section-title { text-align: center; font-size: 28px; font-weight: 700; margin-bottom: 8px; }
-  .section-sub { text-align: center; color: var(--muted); font-size: 14px; margin-bottom: 44px; }
-
-  /* 模型卡片 */
+  /* 卡片栅格 */
   .model-groups { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-  .model-group {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
+  .feature-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .step-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+  mdui-card {
     padding: 26px;
   }
-  .model-group h3 { font-size: 18px; margin-bottom: 4px; }
-  .model-group .tag {
-    display: inline-block;
-    font-size: 12px;
-    padding: 2px 10px;
-    border-radius: 20px;
-    margin-bottom: 16px;
-  }
-  .tag-openai { background: rgba(93, 140, 255, .15); color: #7aa6ff; }
-  .tag-anthropic { background: rgba(220, 160, 90, .15); color: #e0b078; }
-  .model-list { display: flex; flex-wrap: wrap; gap: 10px; }
-  .model-chip {
-    background: #0d1322;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 6px 14px;
-    font-size: 13px;
-    color: var(--text);
-  }
+  .group-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .group-head h3 { font-size: 18px; color: rgb(var(--mdui-color-on-surface)); }
+  .model-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
 
-  /* 特性 */
-  .features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-  .feature {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 24px;
+  .feature-icon {
+    width: 44px; height: 44px;
+    border-radius: var(--mdui-shape-corner-medium);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px;
+    background: rgb(var(--mdui-color-secondary-container));
+    color: rgb(var(--mdui-color-on-secondary-container));
   }
-  .feature .icon { font-size: 26px; margin-bottom: 12px; }
-  .feature h4 { font-size: 16px; margin-bottom: 8px; }
-  .feature p { font-size: 13px; color: var(--muted); }
+  .feature h4 { font-size: 16px; margin-bottom: 6px; color: rgb(var(--mdui-color-on-surface)); }
+  .feature p { font-size: 13px; color: rgb(var(--mdui-color-on-surface-variant)); }
 
-  /* 接入文档 */
-  .docs-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 28px; }
-  .step { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+  .step { position: relative; }
   .step .idx {
-    width: 26px; height: 26px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    color: #fff; font-size: 13px; font-weight: 700;
+    width: 26px; height: 26px; border-radius: var(--mdui-shape-corner-full);
+    background: linear-gradient(135deg, rgb(var(--mdui-color-primary)), rgb(var(--mdui-color-tertiary)));
+    color: rgb(var(--mdui-color-on-primary));
+    font-size: 13px; font-weight: 700;
     display: flex; align-items: center; justify-content: center;
     margin-bottom: 10px;
   }
-  .step h4 { font-size: 15px; margin-bottom: 6px; }
-  .step p { font-size: 13px; color: var(--muted); }
+  .step h4 { font-size: 15px; margin-bottom: 6px; color: rgb(var(--mdui-color-on-surface)); }
+  .step p { font-size: 13px; color: rgb(var(--mdui-color-on-surface-variant)); }
+
+  /* 接入示例 */
+  .code-card { display: block; margin-top: 24px; padding: 0; overflow: hidden; }
+  .code-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 10px 10px 10px 20px;
+    border-bottom: 1px solid rgb(var(--mdui-color-outline-variant));
+    background: rgb(var(--mdui-color-surface-container));
+  }
+  .code-head .hint { font-size: 13px; color: rgb(var(--mdui-color-on-surface-variant)); }
   pre {
-    background: #0d1322;
-    border: 1px solid var(--border);
-    border-radius: 12px;
+    margin: 0;
     padding: 20px;
     font-size: 13px;
-    overflow-x: auto;
-    color: #b8c7e8;
-    font-family: "SF Mono", Consolas, Menlo, monospace;
     line-height: 1.7;
+    overflow-x: auto;
+    color: rgb(var(--mdui-color-on-surface-variant));
+    font-family: "SF Mono", Consolas, Menlo, monospace;
+    background: rgb(var(--mdui-color-surface-container-low));
   }
-
   footer {
-    border-top: 1px solid var(--border);
-    padding: 28px 0;
+    border-top: 1px solid rgb(var(--mdui-color-outline-variant));
+    padding: 26px 0;
     text-align: center;
-    color: var(--muted);
     font-size: 13px;
+    color: rgb(var(--mdui-color-on-surface-variant));
   }
-  footer a {
-    color: var(--muted);
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-  }
-  footer a:hover { color: var(--accent); }
+  footer .inner { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; }
 
-  /* Toast */
-  #toast {
-    position: fixed;
-    left: 50%;
-    bottom: 42px;
-    transform: translateX(-50%) translateY(20px);
-    background: #1c2740;
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 12px 26px;
-    border-radius: 10px;
-    font-size: 14px;
-    opacity: 0;
-    pointer-events: none;
-    transition: all .25s ease;
-    box-shadow: 0 8px 30px rgba(0,0,0,.4);
-  }
-  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  @media (max-width: 820px) {
+  @media (max-width: 900px) {
     .nav-links { display: none; }
-    .model-groups, .features, .docs-steps { grid-template-columns: 1fr; }
+    mdui-dropdown { display: block; }
+    .model-groups, .feature-grid, .step-grid { grid-template-columns: 1fr; }
     .hero h1 { font-size: 30px; }
-    .stats { gap: 32px; }
+    .hero { padding: 56px 0 40px; }
+    .stats { gap: 28px; }
   }
 </style>
 </head>
 <body>
 
-<div class="banner">系统公告：平台运行稳定。注册通道正在维护中，新用户暂未开放注册，老用户不受影响。</div>
-
-<header>
-  <div class="container nav">
-    <div class="logo">
-      <span class="mark">⚡</span>
-      <span>FkAPI</span>
-    </div>
-    <nav class="nav-links">
-      <a href="#models">模型</a>
-      <a href="#features">服务优势</a>
-      <a href="#docs">接入文档</a>
-      <a href="#" id="nav-announce">公告</a>
-    </nav>
-    <div class="nav-actions">
-      <button class="btn btn-ghost" id="btn-login">登录</button>
-      <button class="btn btn-primary" id="btn-register">注册</button>
-    </div>
+<mdui-top-app-bar scroll-behavior="elevate" scroll-threshold="20">
+  <div class="logo">
+    <span class="mark"><mdui-icon name="bolt"></mdui-icon></span>
+    <span>FkAPI</span>
   </div>
-</header>
+  <div class="nav-links">
+    <mdui-button variant="text" href="#models">模型</mdui-button>
+    <mdui-button variant="text" href="#features">服务优势</mdui-button>
+    <mdui-button variant="text" href="#docs">接入文档</mdui-button>
+    <mdui-button variant="text" id="nav-announce">公告</mdui-button>
+  </div>
+  <div style="flex-grow: 1"></div>
+  <mdui-dropdown>
+    <mdui-button-icon slot="trigger" icon="more_vert"></mdui-button-icon>
+    <mdui-menu>
+      <mdui-menu-item href="#models">模型</mdui-menu-item>
+      <mdui-menu-item href="#features">服务优势</mdui-menu-item>
+      <mdui-menu-item href="#docs">接入文档</mdui-menu-item>
+      <mdui-menu-item id="menu-announce">公告</mdui-menu-item>
+    </mdui-menu>
+  </mdui-dropdown>
+  <mdui-button-icon id="btn-theme" icon="light_mode"></mdui-button-icon>
+  <mdui-button variant="text" href="/admin" id="btn-login">登录</mdui-button>
+  <mdui-button variant="tonal" id="btn-register">注册</mdui-button>
+</mdui-top-app-bar>
+
+<div class="banner">
+  <mdui-icon name="campaign"></mdui-icon>
+  <span>系统公告：平台运行稳定。注册通道正在维护中，新用户暂未开放注册，老用户不受影响。</span>
+</div>
 
 <main>
   <section class="hero">
@@ -279,12 +249,12 @@
       <div class="base-url-box">
         <span class="base-url-label">Base URL</span>
         <code id="base-url">https://ai.n1ghtw1nd.com</code>
-        <button class="btn btn-primary btn-copy" id="btn-copy">复制</button>
+        <mdui-button variant="filled" id="btn-copy" icon="content_copy">复制</mdui-button>
       </div>
-      <p>一个 Key 接入 GPT-5.6、Claude 全系模型，稳定高速、按量计费，支持流式输出，兼容 OpenAI / Anthropic 官方接口格式。</p>
+      <p class="lead">一个 Key 接入 GPT-5.6、Claude 全系模型，稳定高速、按量计费，支持流式输出，兼容 OpenAI / Anthropic 官方接口格式。</p>
       <div class="btns">
-        <a class="btn btn-primary" href="#docs">查看接入文档</a>
-        <a class="btn btn-ghost" href="#models">浏览模型</a>
+        <mdui-button variant="filled" href="#docs" end-icon="arrow_forward">查看接入文档</mdui-button>
+        <mdui-button variant="outlined" href="#models">浏览模型</mdui-button>
       </div>
       <div class="stats">
         <div><div class="num">99.9%</div><div class="label">服务可用率</div></div>
@@ -299,30 +269,34 @@
       <div class="section-title">支持的模型</div>
       <div class="section-sub">持续上新，覆盖主流大模型</div>
       <div class="model-groups">
-        <div class="model-group">
-          <span class="tag tag-openai">OpenAI</span>
-          <h3>GPT-5.6 系列</h3>
-          <div class="model-list">
-            <span class="model-chip">gpt-5.6-sol</span>
-            <span class="model-chip">gpt-5.6-terra</span>
-            <span class="model-chip">gpt-5.6-luna</span>
+        <mdui-card variant="outlined">
+          <div class="group-head">
+            <mdui-chip variant="assist" icon="smart_toy">OpenAI</mdui-chip>
+            <h3>GPT-5.6 系列</h3>
           </div>
-        </div>
-        <div class="model-group">
-          <span class="tag tag-anthropic">Anthropic</span>
-          <h3>Claude 系列</h3>
           <div class="model-list">
-            <span class="model-chip">claude-sonnet-4.6</span>
-            <span class="model-chip">claude-sonnet-4.7</span>
-            <span class="model-chip">claude-sonnet-4.8</span>
-            <span class="model-chip">claude-sonnet-5</span>
-            <span class="model-chip">claude-opus-4.6</span>
-            <span class="model-chip">claude-opus-4.7</span>
-            <span class="model-chip">claude-opus-4.8</span>
-            <span class="model-chip">claude-opus-5</span>
-            <span class="model-chip">claude-fable-5</span>
+            <mdui-chip>gpt-5.6-sol</mdui-chip>
+            <mdui-chip>gpt-5.6-terra</mdui-chip>
+            <mdui-chip>gpt-5.6-luna</mdui-chip>
           </div>
-        </div>
+        </mdui-card>
+        <mdui-card variant="outlined">
+          <div class="group-head">
+            <mdui-chip variant="assist" icon="psychology">Anthropic</mdui-chip>
+            <h3>Claude 系列</h3>
+          </div>
+          <div class="model-list">
+            <mdui-chip>claude-sonnet-4.6</mdui-chip>
+            <mdui-chip>claude-sonnet-4.7</mdui-chip>
+            <mdui-chip>claude-sonnet-4.8</mdui-chip>
+            <mdui-chip>claude-sonnet-5</mdui-chip>
+            <mdui-chip>claude-opus-4.6</mdui-chip>
+            <mdui-chip>claude-opus-4.7</mdui-chip>
+            <mdui-chip>claude-opus-4.8</mdui-chip>
+            <mdui-chip>claude-opus-5</mdui-chip>
+            <mdui-chip>claude-fable-5</mdui-chip>
+          </div>
+        </mdui-card>
       </div>
     </div>
   </section>
@@ -331,27 +305,27 @@
     <div class="container">
       <div class="section-title">服务优势</div>
       <div class="section-sub">为开发者打造稳定可靠的 API 服务</div>
-      <div class="features">
-        <div class="feature">
-          <div class="icon">🛡️</div>
+      <div class="feature-grid">
+        <mdui-card variant="filled" class="feature">
+          <div class="feature-icon"><mdui-icon name="shield--outlined"></mdui-icon></div>
           <h4>高可用集群</h4>
           <p>多节点负载均衡，故障自动切换，保障服务稳定。</p>
-        </div>
-        <div class="feature">
-          <div class="icon">⚡</div>
+        </mdui-card>
+        <mdui-card variant="filled" class="feature">
+          <div class="feature-icon"><mdui-icon name="bolt"></mdui-icon></div>
           <h4>高速响应</h4>
           <p>全国多线接入，首字延迟低，支持流式逐字返回。</p>
-        </div>
-        <div class="feature">
-          <div class="icon">💰</div>
+        </mdui-card>
+        <mdui-card variant="filled" class="feature">
+          <div class="feature-icon"><mdui-icon name="payments--outlined"></mdui-icon></div>
           <h4>按量计费</h4>
           <p>用量透明、余额实时可见，量大还有专属优惠。</p>
-        </div>
-        <div class="feature">
-          <div class="icon">🔒</div>
+        </mdui-card>
+        <mdui-card variant="filled" class="feature">
+          <div class="feature-icon"><mdui-icon name="lock--outlined"></mdui-icon></div>
           <h4>安全合规</h4>
           <p>全程 HTTPS 加密，密钥隔离存储，保障数据安全。</p>
-        </div>
+        </mdui-card>
       </div>
     </div>
   </section>
@@ -360,95 +334,181 @@
     <div class="container">
       <div class="section-title">接入文档</div>
       <div class="section-sub">完全兼容 OpenAI / Anthropic 官方格式，三分钟完成接入</div>
-      <div class="docs-steps">
-        <div class="step">
+      <div class="step-grid">
+        <mdui-card variant="outlined" class="step">
           <div class="idx">1</div>
           <h4>获取 API Key</h4>
           <p>登录控制台生成 Key（sk- 开头），用于请求鉴权。</p>
-        </div>
-        <div class="step">
+        </mdui-card>
+        <mdui-card variant="outlined" class="step">
           <div class="idx">2</div>
           <h4>配置 Base URL</h4>
           <p>将客户端的 Base URL 指向部署域名，无需修改其他代码。</p>
-        </div>
-        <div class="step">
+        </mdui-card>
+        <mdui-card variant="outlined" class="step">
           <div class="idx">3</div>
           <h4>开始调用</h4>
           <p>像调用官方 API 一样使用，模型名见上方列表。</p>
-        </div>
+        </mdui-card>
       </div>
+
+      <mdui-card variant="outlined" class="code-card">
+        <mdui-tabs value="curl" full-width>
+          <mdui-tab value="curl" icon="terminal">cURL</mdui-tab>
+          <mdui-tab value="openai" icon="code">OpenAI SDK</mdui-tab>
+          <mdui-tab value="anthropic" icon="code">Anthropic SDK</mdui-tab>
+
+          <mdui-tab-panel slot="panel" value="curl" class="code-panel">
+            <div class="code-head">
+              <span class="hint">POST /v1/chat/completions</span>
+              <mdui-button variant="text" icon="content_copy" data-copy="curl">复制</mdui-button>
+            </div>
+<pre id="code-curl">curl https://ai.n1ghtw1nd.com/v1/chat/completions \
+  -H "Authorization: Bearer $FKAPI_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "claude-sonnet-5",
+    "messages": [{"role": "user", "content": "你好"}],
+    "stream": true
+  }'</pre>
+          </mdui-tab-panel>
+
+          <mdui-tab-panel slot="panel" value="openai" class="code-panel">
+            <div class="code-head">
+              <span class="hint">Python · openai>=1.0</span>
+              <mdui-button variant="text" icon="content_copy" data-copy="openai">复制</mdui-button>
+            </div>
+<pre id="code-openai">from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-xxxxxxxxxxxxxxxx",
+    base_url="https://ai.n1ghtw1nd.com/v1",
+)
+
+resp = client.chat.completions.create(
+    model="gpt-5.6-sol",
+    messages=[{"role": "user", "content": "你好"}],
+)
+print(resp.choices[0].message.content)</pre>
+          </mdui-tab-panel>
+
+          <mdui-tab-panel slot="panel" value="anthropic" class="code-panel">
+            <div class="code-head">
+              <span class="hint">POST /v1/messages</span>
+              <mdui-button variant="text" icon="content_copy" data-copy="anthropic">复制</mdui-button>
+            </div>
+<pre id="code-anthropic">import anthropic
+
+client = anthropic.Anthropic(
+    api_key="sk-xxxxxxxxxxxxxxxx",
+    base_url="https://ai.n1ghtw1nd.com",
+)
+
+msg = client.messages.create(
+    model="claude-opus-5",
+    max_tokens=1024,
+    messages=[{"role": "user", "content": "你好"}],
+)
+print(msg.content[0].text)</pre>
+          </mdui-tab-panel>
+        </mdui-tabs>
+      </mdui-card>
     </div>
   </section>
 </main>
 
 <footer>
-  <div class="container">
-    © 2026 FkAPI ·
-    <a href="https://github.com/XTxiaoting14332/fake-ai-api" target="_blank" rel="noopener">
-      <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+  <div class="container inner">
+    <span>© 2026 FkAPI</span>
+    <mdui-button variant="text" href="https://github.com/XTxiaoting14332/fake-ai-api" target="_blank" rel="noopener">
+      <svg slot="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
       GitHub
-    </a>
+    </mdui-button>
   </div>
 </footer>
 
-<div class="modal-mask" id="maintain-modal">
-  <div class="modal">
-    <div class="modal-icon">🛠️</div>
-    <h3>系统维护公告</h3>
-    <p>平台运行稳定。注册通道正在维护中，新用户暂未开放注册，老用户不受影响。</p>
-    <button class="btn btn-primary" id="modal-close">知道了</button>
-  </div>
-</div>
-
-<div id="toast"></div>
+<mdui-dialog id="maintain-dialog" icon="construction" close-on-overlay-click close-on-esc>
+  <span slot="headline">系统维护公告</span>
+  <span slot="description">平台运行稳定。注册通道正在维护中，新用户暂未开放注册，老用户不受影响。</span>
+  <mdui-button slot="action" variant="text" id="modal-close">知道了</mdui-button>
+</mdui-dialog>
 
 <script>
-  // Toast
-  var toastEl = document.getElementById("toast");
-  function toast(msg) {
-    toastEl.textContent = msg;
-    toastEl.classList.add("show");
-    clearTimeout(toastEl._timer);
-    toastEl._timer = setTimeout(function () { toastEl.classList.remove("show"); }, 2200);
+  function notify(msg) {
+    if (window.mdui && mdui.snackbar) {
+      mdui.snackbar({ message: msg, placement: "bottom" });
+    } else {
+      alert(msg);
+    }
   }
 
-  // Base URL 复制
-  document.getElementById("btn-copy").addEventListener("click", function () {
-    var url = document.getElementById("base-url").textContent;
+  if (window.mdui && mdui.setColorScheme) {
+    mdui.setColorScheme("#5b8cff");
+  }
+
+  // 主题切换
+  var THEME_KEY = "fkapi-theme";
+  var themeBtn = document.getElementById("btn-theme");
+  function applyTheme(theme) {
+    document.documentElement.className = "mdui-theme-" + theme;
+    themeBtn.setAttribute("icon", theme === "dark" ? "light_mode" : "dark_mode");
+  }
+  var savedTheme = "dark";
+  try { savedTheme = localStorage.getItem(THEME_KEY) || "dark"; } catch (e) {}
+  applyTheme(savedTheme);
+  themeBtn.addEventListener("click", function () {
+    savedTheme = savedTheme === "dark" ? "light" : "dark";
+    try { localStorage.setItem(THEME_KEY, savedTheme); } catch (e) {}
+    applyTheme(savedTheme);
+    notify(savedTheme === "dark" ? "已切换到深色模式" : "已切换到浅色模式");
+  });
+
+  // 复制到剪贴板
+  function copyText(text, onDone) {
     var fallback = function () {
       var ta = document.createElement("textarea");
-      ta.value = url;
+      ta.value = text;
       ta.style.position = "fixed";
       ta.style.opacity = "0";
       document.body.appendChild(ta);
       ta.select();
-      try { document.execCommand("copy"); toast("已复制"); }
-      catch (e) { toast("复制失败，请手动复制"); }
+      try { document.execCommand("copy"); onDone(true); }
+      catch (e) { onDone(false); }
       document.body.removeChild(ta);
     };
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(url).then(function () { toast("已复制"); }, fallback);
+      navigator.clipboard.writeText(text).then(function () { onDone(true); }, fallback);
     } else {
       fallback();
     }
+  }
+
+  document.getElementById("btn-copy").addEventListener("click", function () {
+    copyText(document.getElementById("base-url").textContent.trim(), function (ok) {
+      notify(ok ? "Base URL 已复制" : "复制失败，请手动复制");
+    });
   });
 
-  document.getElementById("btn-register").addEventListener("click", function (e) {
-    e.preventDefault();
-    toast("暂未开放注册");
-  });
-  document.getElementById("btn-login").addEventListener("click", function (e) {
-    e.preventDefault();
-    toast("控制台系统维护中");
+  document.querySelectorAll("[data-copy]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var pre = document.getElementById("code-" + btn.getAttribute("data-copy"));
+      copyText(pre.textContent, function (ok) {
+        notify(ok ? "代码已复制" : "复制失败，请手动复制");
+      });
+    });
   });
 
-  // 系统维护公告弹窗：点导航栏“公告”弹出，点“知道了”关闭
-  document.getElementById("nav-announce").addEventListener("click", function (e) {
-    e.preventDefault();
-    document.getElementById("maintain-modal").style.display = "flex";
+  document.getElementById("btn-register").addEventListener("click", function () {
+    notify("暂未开放注册");
   });
+
+  // 维护公告弹窗
+  var maintainDialog = document.getElementById("maintain-dialog");
+  function openMaintain() { maintainDialog.open = true; }
+  document.getElementById("nav-announce").addEventListener("click", openMaintain);
+  document.getElementById("menu-announce").addEventListener("click", openMaintain);
   document.getElementById("modal-close").addEventListener("click", function () {
-    document.getElementById("maintain-modal").style.display = "none";
+    maintainDialog.open = false;
   });
 </script>
 </body>

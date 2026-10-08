@@ -4,6 +4,7 @@
 import { createHandler } from "./lib/handler";
 import ASCII_LIST from "./ascii/manifest.js";
 import INDEX_HTML from "./index.html";
+import ADMIN_HTML from "./admin.html";
 import ROBOTS_TXT from "./robots.txt";
 import SITEMAP_XML from "./sitemap.xml";
 
@@ -15,6 +16,7 @@ function getHandler(env) {
       assets: {
         asciiList: ASCII_LIST,
         indexHtml: INDEX_HTML,
+        adminHtml: ADMIN_HTML,
         robotsTxt: ROBOTS_TXT,
         sitemapXml: SITEMAP_XML,
       },

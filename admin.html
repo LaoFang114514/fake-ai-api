@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="mdui-theme-dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="renderer" content="webkit">
+<meta name="robots" content="noindex, nofollow">
+<title>控制台 - FkAPI</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@2.1.5/mdui.css"
+      onerror="this.onerror=null;this.href='https://registry.npmmirror.com/mdui/2.1.5/files/mdui.css'">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/material-icons@1.13.1/iconfont/material-icons.css"
+      onerror="this.onerror=null;this.href='https://fonts.googleapis.com/icon?family=Material+Icons+Outlined'">
+<script src="https://cdn.jsdelivr.net/npm/mdui@2.1.5/mdui.global.js"
+        onerror="this.onerror=null;this.src='https://registry.npmmirror.com/mdui/2.1.5/files/mdui.global.js'"></script>
+
+<style>
+  :root { --side-w: 236px; --head-h: 60px; }
+  mdui-dialog:not(:defined) { display: none; }
+  html, body { height: 100%; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+  }
+  [hidden] { display: none !important; }
+  a { color: rgb(var(--mdui-color-primary)); text-decoration: none; }
+
+  /* ---------- 登录 ---------- */
+  .login-wrap {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+    background:
+      radial-gradient(1000px 500px at 15% 0%, rgba(var(--mdui-color-primary), .18), transparent 60%),
+      radial-gradient(800px 460px at 90% 100%, rgba(var(--mdui-color-tertiary), .16), transparent 60%);
+  }
+  .login-card {
+    display: block;
+    width: 100%; max-width: 404px;
+    padding: 34px 32px 26px;
+    border-radius: var(--mdui-shape-corner-extra-large);
+  }
+  .login-brand { display: flex; align-items: center; gap: 10px; justify-content: center; }
+  .mark {
+    width: 34px; height: 34px;
+    border-radius: var(--mdui-shape-corner-small);
+    background: linear-gradient(135deg, rgb(var(--mdui-color-primary)), rgb(var(--mdui-color-tertiary)));
+    display: flex; align-items: center; justify-content: center;
+    color: rgb(var(--mdui-color-on-primary));
+    flex: none;
+  }
+  .mark mdui-icon { font-size: 20px; }
+  .login-brand .name { font-size: 21px; font-weight: 700; color: rgb(var(--mdui-color-on-surface)); }
+  .login-sub {
+    text-align: center; font-size: 13px; margin: 6px 0 26px;
+    color: rgb(var(--mdui-color-on-surface-variant));
+  }
+  .login-card mdui-text-field { display: block; width: 100%; margin-bottom: 16px; }
+  .captcha-row { display: flex; align-items: flex-end; gap: 12px; }
+  .captcha-row mdui-text-field { flex: 1; }
+  .captcha-box {
+    display: flex; align-items: center; gap: 6px;
+    height: 56px; padding: 0 14px;
+    border-radius: var(--mdui-shape-corner-small);
+    border: 1px solid rgb(var(--mdui-color-outline));
+    font-family: "SF Mono", Consolas, Menlo, monospace;
+    font-size: 17px; font-weight: 700; letter-spacing: 2px;
+    color: rgb(var(--mdui-color-on-surface));
+    background: rgb(var(--mdui-color-surface-container-high));
+    user-select: none; cursor: pointer; white-space: nowrap;
+  }
+  .login-row {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 13px; margin: 2px 0 20px;
+    color: rgb(var(--mdui-color-on-surface-variant));
+  }
+  .login-foot {
+    margin-top: 22px; padding-top: 18px;
+    border-top: 1px solid rgb(var(--mdui-color-outline-variant));
+    display: flex; gap: 10px; justify-content: center;
+  }
+  .login-tip { text-align: center; font-size: 12px; margin-top: 16px; color: rgb(var(--mdui-color-on-surface-variant)); }
+  .login-version { text-align: center; font-size: 12px; margin-top: 18px; color: rgb(var(--mdui-color-on-surface-variant)); opacity: .75; }
+
+  /* ---------- 控制台骨架 ---------- */
+  .sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0; z-index: 20;
+    width: var(--side-w);
+    display: flex; flex-direction: column;
+    background: rgb(var(--mdui-color-surface-container));
+    border-right: 1px solid rgb(var(--mdui-color-outline-variant));
+    transition: transform .22s ease;
+  }
+  .side-head {
+    display: flex; align-items: center; gap: 9px;
+    height: var(--head-h); padding: 0 18px; flex: none;
+    border-bottom: 1px solid rgb(var(--mdui-color-outline-variant));
+    font-size: 17px; font-weight: 700; color: rgb(var(--mdui-color-on-surface));
+  }
+  .side-nav { flex: 1; overflow-y: auto; padding: 10px 8px; }
+  .side-nav .group {
+    font-size: 11px; letter-spacing: .08em; padding: 14px 14px 6px;
+    color: rgb(var(--mdui-color-on-surface-variant)); opacity: .8;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    height: 44px; padding: 0 14px; margin-bottom: 2px;
+    border-radius: var(--mdui-shape-corner-full);
+    font-size: 14px; cursor: pointer;
+    color: rgb(var(--mdui-color-on-surface-variant));
+  }
+  .nav-item mdui-icon { font-size: 20px; }
+  .nav-item:hover { background: rgba(var(--mdui-color-on-surface), .06); }
+  .nav-item.active {
+    background: rgb(var(--mdui-color-secondary-container));
+    color: rgb(var(--mdui-color-on-secondary-container));
+    font-weight: 600;
+  }
+  .side-foot { flex: none; padding: 14px; border-top: 1px solid rgb(var(--mdui-color-outline-variant)); }
+  .side-foot .quota {
+    font-size: 12px; color: rgb(var(--mdui-color-on-surface-variant)); margin-bottom: 8px;
+  }
+  .side-foot .quota b {
+    display: block; font-size: 19px; color: rgb(var(--mdui-color-on-surface));
+    font-weight: 700; letter-spacing: -.02em;
+  }
+
+  .main { margin-left: var(--side-w); min-height: 100vh; display: flex; flex-direction: column; }
+  .topbar {
+    position: sticky; top: 0; z-index: 15;
+    height: var(--head-h); flex: none;
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 20px;
+    background: rgb(var(--mdui-color-surface));
+    border-bottom: 1px solid rgb(var(--mdui-color-outline-variant));
+  }
+  .topbar h1 { font-size: 18px; font-weight: 600; margin: 0; white-space: nowrap; color: rgb(var(--mdui-color-on-surface)); }
+  .topbar .grow { flex: 1; }
+  .chip-status {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; padding: 4px 12px;
+    border-radius: var(--mdui-shape-corner-full);
+    background: rgb(var(--mdui-color-tertiary-container));
+    color: rgb(var(--mdui-color-on-tertiary-container));
+  }
+  .chip-status .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: rgb(var(--mdui-color-tertiary));
+  }
+  #btn-menu { display: none; }
+  .pages { padding: 24px; flex: 1; }
+  .page { max-width: 1180px; margin: 0 auto; }
+
+  /* ---------- 通用块 ---------- */
+  .grid { display: grid; gap: 18px; }
+  .g4 { grid-template-columns: repeat(4, 1fr); }
+  .g2 { grid-template-columns: 1.55fr 1fr; }
+  .panel {
+    display: block;
+    padding: 20px;
+    border-radius: var(--mdui-shape-corner-large);
+    background: rgb(var(--mdui-color-surface-container-low));
+    border: 1px solid rgb(var(--mdui-color-outline-variant));
+  }
+  .panel-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; margin-bottom: 16px;
+  }
+  .panel-head h2 { font-size: 15px; font-weight: 600; margin: 0; color: rgb(var(--mdui-color-on-surface)); }
+  .panel-head .hint { font-size: 12px; color: rgb(var(--mdui-color-on-surface-variant)); }
+
+  .stat .label { font-size: 13px; color: rgb(var(--mdui-color-on-surface-variant)); }
+  .stat .value {
+    font-size: 27px; font-weight: 700; letter-spacing: -.02em; margin: 2px 0;
+    color: rgb(var(--mdui-color-on-surface));
+  }
+  .stat .delta { font-size: 12px; display: flex; align-items: center; gap: 3px; }
+  .delta.up { color: rgb(var(--mdui-color-tertiary)); }
+  .delta.down { color: rgb(var(--mdui-color-error)); }
+  .stat .icon {
+    width: 38px; height: 38px; border-radius: var(--mdui-shape-corner-medium);
+    display: flex; align-items: center; justify-content: center;
+    background: rgb(var(--mdui-color-primary-container));
+    color: rgb(var(--mdui-color-on-primary-container));
+    float: right;
+  }
+
+  /* 柱状图 */
+  .chart { display: flex; align-items: stretch; gap: 8px; height: 168px; }
+  .chart .col {
+    flex: 1; height: 100%;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: flex-end; gap: 6px;
+  }
+  .chart .bar {
+    width: 100%; border-radius: 6px 6px 2px 2px;
+    background: linear-gradient(180deg, rgb(var(--mdui-color-primary)), rgba(var(--mdui-color-primary), .35));
+    transition: filter .15s ease;
+  }
+  .chart .col:hover .bar { filter: brightness(1.25); }
+  .chart .x { font-size: 10px; color: rgb(var(--mdui-color-on-surface-variant)); }
+
+  /* 模型占比 */
+  .ratio { margin-bottom: 14px; }
+  .ratio .top {
+    display: flex; justify-content: space-between;
+    font-size: 13px; color: rgb(var(--mdui-color-on-surface-variant)); margin-bottom: 4px;
+  }
+  .ratio .track {
+    height: 7px; border-radius: var(--mdui-shape-corner-full);
+    background: rgb(var(--mdui-color-surface-container-high)); overflow: hidden;
+  }
+  .ratio .fill { height: 100%; border-radius: var(--mdui-shape-corner-full); background: rgb(var(--mdui-color-primary)); }
+
+  /* 接入教程 */
+  .tut { list-style: none; margin: 0 0 16px; padding: 0; }
+  .tut li {
+    display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px;
+    font-size: 13px; color: rgb(var(--mdui-color-on-surface-variant));
+  }
+  .tut .n, .doc-step .n {
+    flex: none; width: 20px; height: 20px;
+    border-radius: var(--mdui-shape-corner-full);
+    background: rgb(var(--mdui-color-primary-container));
+    color: rgb(var(--mdui-color-on-primary-container));
+    font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .doc-steps { margin: 2px 0 16px; }
+  .doc-step { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px; }
+  .doc-step b { display: block; font-size: 14px; font-weight: 600; color: rgb(var(--mdui-color-on-surface)); }
+  .doc-step i {
+    display: block; font-style: normal; font-size: 12.5px;
+    color: rgb(var(--mdui-color-on-surface-variant));
+  }
+  .pager { display: flex; align-items: center; gap: 4px; }
+  .tut-code {
+    margin: 0 0 16px; padding: 14px;
+    font-size: 12px; line-height: 1.7; white-space: pre; overflow-x: auto;
+    border-radius: var(--mdui-shape-corner-medium);
+    background: rgb(var(--mdui-color-surface-container));
+    border: 1px solid rgb(var(--mdui-color-outline-variant));
+    color: rgb(var(--mdui-color-on-surface-variant));
+    font-family: "SF Mono", Consolas, Menlo, monospace;
+  }
+
+  /* 表格 */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    text-align: left; font-weight: 600; white-space: nowrap;
+    padding: 11px 12px;
+    color: rgb(var(--mdui-color-on-surface-variant));
+    border-bottom: 1px solid rgb(var(--mdui-color-outline-variant));
+    background: rgb(var(--mdui-color-surface-container));
+  }
+  td {
+    padding: 11px 12px; white-space: nowrap;
+    color: rgb(var(--mdui-color-on-surface));
+    border-bottom: 1px solid rgb(var(--mdui-color-outline-variant));
+  }
+  tbody tr:hover td { background: rgba(var(--mdui-color-on-surface), .04); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  code.mono {
+    font-family: "SF Mono", Consolas, Menlo, monospace; font-size: 12.5px;
+    color: rgb(var(--mdui-color-on-surface-variant));
+  }
+  .tag {
+    display: inline-block; padding: 2px 9px; font-size: 12px;
+    border-radius: var(--mdui-shape-corner-small);
+    background: rgb(var(--mdui-color-surface-container-high));
+    color: rgb(var(--mdui-color-on-surface-variant));
+  }
+  .tag.ok { background: rgb(var(--mdui-color-tertiary-container)); color: rgb(var(--mdui-color-on-tertiary-container)); }
+  .tag.warn { background: rgb(var(--mdui-color-error-container)); color: rgb(var(--mdui-color-on-error-container)); }
+  .tag.mut { background: rgb(var(--mdui-color-secondary-container)); color: rgb(var(--mdui-color-on-secondary-container)); }
+  .row-actions { display: flex; gap: 2px; }
+  .key-cell { display: flex; align-items: center; gap: 4px; }
+
+  .toolbar {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .toolbar .grow { flex: 1; }
+  .toolbar mdui-text-field, .toolbar mdui-select { min-width: 168px; }
+
+  .form-row { margin-bottom: 16px; }
+  .form-row mdui-text-field { display: block; width: 100%; max-width: 420px; }
+  .form-row .desc { font-size: 12px; color: rgb(var(--mdui-color-on-surface-variant)); margin-top: 4px; }
+  .balance-big { font-size: 34px; font-weight: 700; letter-spacing: -.02em; color: rgb(var(--mdui-color-on-surface)); }
+  .amount-chips { display: flex; gap: 10px; flex-wrap: wrap; margin: 4px 0 18px; }
+
+  .mask {
+    position: fixed; inset: 0; z-index: 19;
+    background: rgba(0, 0, 0, .45);
+  }
+
+  /* 体验账号：请求与调用数据打码 */
+  .masked { position: relative; }
+  .masked > .blur {
+    filter: blur(7px);
+    -webkit-user-select: none; user-select: none;
+    pointer-events: none;
+  }
+  .masked > .faded {
+    filter: blur(6px);
+    opacity: .55;
+    -webkit-user-select: none; user-select: none;
+    pointer-events: none;
+  }
+  .mask-note {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    padding: 12px;
+  }
+  .mask-note .box {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    padding: 18px 24px; text-align: center;
+    border-radius: var(--mdui-shape-corner-large);
+    background: rgba(var(--mdui-color-surface), .88);
+    border: 1px solid rgb(var(--mdui-color-outline-variant));
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+  }
+  .mask-note mdui-icon { font-size: 24px; color: rgb(var(--mdui-color-on-surface-variant)); }
+  .mask-note .title { font-size: 14px; font-weight: 600; color: rgb(var(--mdui-color-on-surface)); }
+  .mask-note .desc {
+    font-size: 12px; max-width: 300px;
+    color: rgb(var(--mdui-color-on-surface-variant));
+  }
+
+  @media (max-width: 720px) { .chip-status { display: none; } }
+  @media (max-width: 560px) { #btn-quick-topup { display: none; } }
+  @media (max-width: 1080px) { .g4 { grid-template-columns: repeat(2, 1fr); } .g2 { grid-template-columns: 1fr; } }
+  @media (max-width: 960px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: none; }
+    .main { margin-left: 0; }
+    #btn-menu { display: flex; }
+    .pages { padding: 16px; }
+  }
+  @media (max-width: 620px) { .g4 { grid-template-columns: 1fr; } .login-card { padding: 26px 20px 20px; } }
+</style>
+</head>
+<body>
+
+<!-- ============ 登录 ============ -->
+<div id="view-login" class="login-wrap">
+  <mdui-card variant="elevated" class="login-card">
+    <div class="login-brand">
+      <span class="mark"><mdui-icon name="bolt"></mdui-icon></span>
+      <span class="name">FkAPI 控制台</span>
+    </div>
+    <div class="login-sub">AI 模型接口中转服务 · 管理后台</div>
+
+    <mdui-text-field id="f-user" label="用户名" variant="outlined" icon="person" autocomplete="username" clearable></mdui-text-field>
+    <mdui-text-field id="f-pass" label="密码" variant="outlined" icon="lock" type="password" toggle-password autocomplete="current-password"></mdui-text-field>
+
+    <div class="captcha-row">
+      <mdui-text-field id="f-captcha" label="验证码" variant="outlined" icon="verified" maxlength="4" autocomplete="off"></mdui-text-field>
+      <div class="captcha-box" id="captcha-box" title="点击刷新验证码"></div>
+    </div>
+
+    <div class="login-row">
+      <mdui-checkbox id="f-remember">记住登录状态</mdui-checkbox>
+      <a href="#" id="link-forget">忘记密码？</a>
+    </div>
+
+    <mdui-button id="btn-login" variant="filled" full-width>登 录</mdui-button>
+
+    <div class="login-foot">
+      <mdui-button variant="tonal" icon="tag" id="btn-oauth">使用邀请码登录</mdui-button>
+      <mdui-button variant="text" icon="help" id="btn-help">帮助</mdui-button>
+    </div>
+    <div class="login-tip">连续 5 次失败将锁定账号 15 分钟</div>
+    <div class="login-version">FkAPI v1.7.2 · 服务器时区 UTC+8</div>
+  </mdui-card>
+</div>
+
+<!-- ============ 控制台 ============ -->
+<div id="view-app" hidden>
+  <aside class="sidebar" id="sidebar">
+    <div class="side-head">
+      <span class="mark"><mdui-icon name="bolt"></mdui-icon></span>
+      <span>FkAPI</span>
+    </div>
+    <nav class="side-nav">
+      <div class="group">数据</div>
+      <div class="nav-item active" data-view="overview"><mdui-icon name="space_dashboard"></mdui-icon><span>概览</span></div>
+      <div class="nav-item" data-view="tokens"><mdui-icon name="key"></mdui-icon><span>令牌管理</span></div>
+      <div class="nav-item" data-view="logs"><mdui-icon name="receipt_long"></mdui-icon><span>使用日志</span></div>
+      <div class="group">资源</div>
+      <div class="nav-item" data-view="models"><mdui-icon name="model_training"></mdui-icon><span>模型管理</span></div>
+      <div class="nav-item" data-view="channels"><mdui-icon name="hub"></mdui-icon><span>渠道状态</span></div>
+      <div class="nav-item" data-view="topup"><mdui-icon name="account_balance_wallet"></mdui-icon><span>充值</span><span class="tag warn" style="margin-left:auto">已关闭</span></div>
+      <div class="group">账号</div>
+      <div class="nav-item" data-view="account"><mdui-icon name="person"></mdui-icon><span>个人设置</span><span class="tag warn" style="margin-left:auto">不可用</span></div>
+    </nav>
+    <div class="side-foot">
+      <div class="quota">账户余额<b id="side-balance">--</b></div>
+      <div style="font-size:12px;color:rgb(var(--mdui-color-on-surface-variant));margin-bottom:8px">
+        体验账号 · 请求与调用数据已隐藏
+      </div>
+      <mdui-button variant="text" icon="logout" id="btn-logout">退出登录</mdui-button>
+    </div>
+  </aside>
+  <div class="mask" id="side-mask" hidden></div>
+
+  <div class="main">
+    <div class="topbar">
+      <mdui-button-icon id="btn-menu" icon="menu"></mdui-button-icon>
+      <h1 id="page-title">概览</h1>
+      <span class="chip-status"><span class="dot"></span>服务运行中</span>
+      <span class="tag mut">体验账号</span>
+      <div class="grow"></div>
+      <mdui-button variant="tonal" icon="payments" id="btn-quick-topup">充值</mdui-button>
+      <mdui-button-icon id="btn-theme" icon="light_mode"></mdui-button-icon>
+      <mdui-avatar icon="admin_panel_settings"></mdui-avatar>
+    </div>
+
+    <div class="pages">
+      <!-- 概览 -->
+      <section class="page" id="page-overview">
+        <div class="grid g4" id="stat-cards"></div>
+
+        <div class="grid g2" style="margin-top:18px">
+          <mdui-card variant="outlined" class="panel">
+            <div class="panel-head">
+              <h2>近 14 天请求量</h2>
+              <span class="hint" id="chart-total">--</span>
+            </div>
+            <div class="masked">
+              <div class="chart blur" id="chart"></div>
+              <div class="mask-note"><div class="box">
+                <mdui-icon name="visibility_off"></mdui-icon>
+                <div class="title">体验账号暂不可见</div>
+                <div class="desc">请求量统计仅对正式账号开放，升级后可查看完整调用趋势。</div>
+              </div></div>
+            </div>
+          </mdui-card>
+
+          <mdui-card variant="outlined" class="panel">
+            <div class="panel-head"><h2>模型消耗占比</h2><span class="hint">按额度</span></div>
+            <div id="model-ratio"></div>
+          </mdui-card>
+        </div>
+
+        <div class="grid g2" style="margin-top:18px">
+          <mdui-card variant="outlined" class="panel">
+            <div class="panel-head">
+              <h2>最近调用</h2>
+              <mdui-button variant="text" id="btn-more-logs">查看全部</mdui-button>
+            </div>
+            <div class="masked">
+              <div class="table-wrap blur"><table>
+                <thead><tr><th>时间</th><th>模型</th><th class="num">额度</th><th class="num">耗时</th><th>状态</th></tr></thead>
+                <tbody id="recent-logs"></tbody>
+              </table></div>
+              <div class="mask-note"><div class="box">
+                <mdui-icon name="visibility_off"></mdui-icon>
+                <div class="title">调用记录已隐藏</div>
+                <div class="desc">体验账号暂不支持查看调用明细。</div>
+              </div></div>
+            </div>
+          </mdui-card>
+
+          <mdui-card variant="outlined" class="panel">
+            <div class="panel-head">
+              <h2>接入教程</h2>
+              <mdui-button variant="text" icon="menu_book" id="btn-docs">完整文档</mdui-button>
+            </div>
+            <ol class="tut">
+              <li><span class="n">1</span><span>在「令牌管理」复制 API Key（sk- 开头）</span></li>
+              <li><span class="n">2</span><span>Base URL 指向 <code class="mono" id="tut-base"></code></span></li>
+              <li><span class="n">3</span><span>按 OpenAI / Anthropic 官方格式调用即可</span></li>
+            </ol>
+            <pre class="tut-code" id="tut-code"></pre>
+            <mdui-button variant="tonal" icon="content_copy" id="btn-tut-copy">复制示例</mdui-button>
+          </mdui-card>
+        </div>
+      </section>
+
+      <!-- 令牌 -->
+      <section class="page" id="page-tokens" hidden>
+        <mdui-card variant="outlined" class="panel">
+          <div class="toolbar">
+            <mdui-button variant="filled" icon="add" id="btn-new-token" disabled>新建令牌</mdui-button>
+            <mdui-button variant="tonal" icon="sync" id="btn-sync-token">同步</mdui-button>
+            <span class="hint" style="font-size:13px;color:rgb(var(--mdui-color-on-surface-variant))">令牌由平台统一分配，暂不支持自助创建</span>
+            <div class="grow"></div>
+            <mdui-text-field variant="outlined" icon="search" label="搜索令牌名称" dense clearable></mdui-text-field>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr>
+              <th>名称</th><th>密钥</th><th class="num">已用额度</th><th class="num">剩余额度</th>
+              <th>分组</th><th>接入网站</th><th>创建时间</th><th>到期时间</th><th>最后使用</th><th>状态</th><th>操作</th>
+            </tr></thead>
+            <tbody id="token-rows"></tbody>
+          </table></div>
+        </mdui-card>
+      </section>
+
+      <!-- 日志 -->
+      <section class="page" id="page-logs" hidden>
+        <mdui-card variant="outlined" class="panel">
+          <div class="toolbar">
+            <mdui-text-field variant="outlined" label="开始时间" dense value="2026-10-01 00:00" readonly style="min-width:186px"></mdui-text-field>
+            <mdui-text-field variant="outlined" label="结束时间" dense value="2026-10-08 23:59" readonly style="min-width:186px"></mdui-text-field>
+            <mdui-text-field variant="outlined" label="模型" dense clearable placeholder="全部模型"></mdui-text-field>
+            <mdui-button variant="tonal" icon="filter_list">筛选</mdui-button>
+            <div class="grow"></div>
+            <mdui-button variant="text" icon="download" id="btn-export">导出 CSV</mdui-button>
+          </div>
+          <div class="masked">
+            <div class="blur">
+              <div class="table-wrap"><table>
+                <thead><tr>
+                  <th>时间</th><th>类型</th><th>模型</th><th class="num">输入</th><th class="num">输出</th>
+                  <th class="num">额度</th><th class="num">耗时</th><th class="num">首字</th><th>来源 IP</th><th>状态</th>
+                </tr></thead>
+                <tbody id="log-rows"></tbody>
+              </table></div>
+              <div class="toolbar" style="margin:16px 0 0">
+                <span class="hint" id="log-count" style="font-size:13px;color:rgb(var(--mdui-color-on-surface-variant))"></span>
+                <div class="grow"></div>
+                <div class="pager" id="log-pager"></div>
+              </div>
+            </div>
+            <div class="mask-note"><div class="box">
+              <mdui-icon name="visibility_off"></mdui-icon>
+              <div class="title">调用记录已隐藏</div>
+              <div class="desc">体验账号暂不支持查看与导出调用明细，升级正式版后自动开放。</div>
+              <mdui-button variant="tonal" icon="workspace_premium" id="btn-upgrade">申请正式版</mdui-button>
+            </div></div>
+          </div>
+        </mdui-card>
+      </section>
+
+      <!-- 模型 -->
+      <section class="page" id="page-models" hidden>
+        <mdui-card variant="outlined" class="panel">
+          <div class="toolbar">
+            <mdui-button variant="filled" icon="add" id="btn-add-model">添加模型</mdui-button>
+            <div class="grow"></div>
+            <mdui-text-field variant="outlined" icon="search" label="搜索模型" dense clearable></mdui-text-field>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr>
+              <th>模型 ID</th><th>厂商</th><th>状态</th><th class="num">输入倍率</th><th class="num">输出倍率</th>
+              <th class="num">今日调用</th><th class="num">平均耗时</th><th>可用分组</th>
+            </tr></thead>
+            <tbody id="model-rows"></tbody>
+          </table></div>
+        </mdui-card>
+      </section>
+
+      <!-- 渠道 -->
+      <section class="page" id="page-channels" hidden>
+        <mdui-card variant="outlined" class="panel">
+          <div class="panel-head"><h2>上游渠道</h2><span class="hint" id="channel-updated"></span></div>
+          <div class="table-wrap"><table>
+            <thead><tr>
+              <th>渠道</th><th>名称</th><th>状态</th><th class="num">延迟</th><th class="num">成功率</th>
+              <th class="num">权重</th><th class="num">今日额度</th><th>最近探测</th>
+            </tr></thead>
+            <tbody id="channel-rows"></tbody>
+          </table></div>
+        </mdui-card>
+      </section>
+
+      <!-- 充值（已关闭） -->
+      <section class="page" id="page-topup" hidden>
+        <div class="grid g2">
+          <mdui-card variant="outlined" class="panel">
+            <div class="panel-head">
+              <h2>账户余额</h2>
+              <span class="tag warn">充值通道已关闭</span>
+            </div>
+            <div class="balance-big" id="topup-balance">--</div>
+            <div class="hint" style="font-size:12px;color:rgb(var(--mdui-color-on-surface-variant))">
+              累计充值 <span id="topup-total"></span> · 当前套餐 专业版
+            </div>
+            <div style="
+              display:flex; gap:10px; align-items:flex-start;
+              margin:22px 0 18px; padding:14px 16px;
+              border-radius:var(--mdui-shape-corner-medium);
+              background:rgb(var(--mdui-color-surface-container));
+              border:1px solid rgb(var(--mdui-color-outline-variant));
+              font-size:13px; color:rgb(var(--mdui-color-on-surface-variant))">
+              <mdui-icon name="payments" style="font-size:20px"></mdui-icon>
+              <span>应监管要求，平台已暂停充值与注册，余额可正常消耗至用完；已付费用户不受影响，续费通道恢复时间另行通知。</span>
+            </div>
+            <div class="amount-chips">
+              <mdui-chip selectable disabled variant="suggestion">¥10</mdui-chip>
+              <mdui-chip selectable disabled variant="suggestion">¥50</mdui-chip>
+              <mdui-chip selectable disabled variant="suggestion">¥100</mdui-chip>
+              <mdui-chip selectable disabled variant="suggestion">¥500</mdui-chip>
+              <mdui-chip selectable disabled variant="suggestion">¥1000</mdui-chip>
+            </div>
+            <div class="form-row">
+              <mdui-text-field variant="outlined" label="充值卡密" icon="vpn_key" placeholder="充值功能已关闭" disabled></mdui-text-field>
+            </div>
+            <mdui-button variant="filled" icon="block" id="btn-topup" disabled>充值通道已关闭</mdui-button>
+          </mdui-card>
+
+          <mdui-card variant="outlined" class="panel">
+            <div class="panel-head"><h2>价格说明</h2></div>
+            <div class="ratio"><div class="top"><span>GPT-5.6 系列</span><span>$2.50 / 1M tokens</span></div><div class="track"><div class="fill" style="width:62%"></div></div></div>
+            <div class="ratio"><div class="top"><span>Claude Sonnet</span><span>$3.00 / 1M tokens</span></div><div class="track"><div class="fill" style="width:74%"></div></div></div>
+            <div class="ratio"><div class="top"><span>Claude Opus</span><span>$15.00 / 1M tokens</span></div><div class="track"><div class="fill" style="width:100%"></div></div></div>
+            <div class="ratio"><div class="top"><span>Claude Fable</span><span>$8.00 / 1M tokens</span></div><div class="track"><div class="fill" style="width:88%"></div></div></div>
+            <div style="font-size:12px;color:rgb(var(--mdui-color-on-surface-variant));margin-top:14px">
+              以上价格已含平台服务费；流式输出按实际 token 结算，失败请求不计费。
+            </div>
+          </mdui-card>
+        </div>
+      </section>
+
+      <!-- 个人设置 -->
+      <section class="page" id="page-account" hidden>
+        <div class="masked">
+        <div class="grid g2 faded">
+          <mdui-card variant="outlined" class="panel">
+            <div class="panel-head"><h2>账号信息</h2></div>
+            <div class="form-row">
+              <mdui-text-field variant="outlined" label="用户名" value="admin123" icon="person"></mdui-text-field>
+            </div>
+            <div class="form-row">
+              <mdui-text-field variant="outlined" label="邮箱" value="114514@laofang.top" icon="email"></mdui-text-field>
+            </div>
+            <div class="form-row">
+              <mdui-text-field variant="outlined" label="新密码" icon="lock" type="password" toggle-password placeholder="不修改请留空"></mdui-text-field>
+              <div class="desc">至少 8 位，需包含字母与数字</div>
+            </div>
+            <div class="form-row">
+              <mdui-text-field variant="outlined" label="确认新密码" icon="lock_reset" type="password" toggle-password></mdui-text-field>
+            </div>
+            <mdui-button variant="filled" icon="save" id="btn-save-account">保存修改</mdui-button>
+          </mdui-card>
+
+          <div class="grid" style="align-content:start">
+            <mdui-card variant="outlined" class="panel">
+              <div class="panel-head"><h2>安全设置</h2></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px">
+                <div>
+                  <div style="font-size:14px;color:rgb(var(--mdui-color-on-surface))">两步验证</div>
+                  <div style="font-size:12px;color:rgb(var(--mdui-color-on-surface-variant))">登录时需要额外验证码</div>
+                </div>
+                <mdui-switch></mdui-switch>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <div>
+                  <div style="font-size:14px;color:rgb(var(--mdui-color-on-surface))">登录 IP 白名单</div>
+                  <div style="font-size:12px;color:rgb(var(--mdui-color-on-surface-variant))">仅允许指定网段登录后台</div>
+                </div>
+                <mdui-switch checked></mdui-switch>
+              </div>
+            </mdui-card>
+            <mdui-card variant="outlined" class="panel">
+              <div class="panel-head"><h2>通知</h2></div>
+              <div style="font-size:13px;color:rgb(var(--mdui-color-on-surface-variant));line-height:2">
+                余额不足提醒 · 已开启（阈值 $50.00）<br>
+                渠道异常提醒 · 已开启（邮件）<br>
+                每日用量报告 · 每天 09:00 推送
+              </div>
+            </mdui-card>
+          </div>
+        </div>
+          <div class="mask-note"><div class="box">
+            <mdui-icon name="account_circle"></mdui-icon>
+            <div class="title">此账号不可用</div>
+            <div class="desc">体验账号不支持修改个人信息与安全设置，如需变更请联系管理员。</div>
+          </div></div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- 完整接入文档 -->
+<mdui-dialog id="docs-dialog" close-on-overlay-click close-on-esc>
+  <span slot="headline">接入文档</span>
+  <span slot="description">完全兼容 OpenAI / Anthropic 官方格式，三分钟完成接入</span>
+  <div class="doc-steps">
+    <div class="doc-step"><span class="n">1</span><div><b>获取 API Key</b><i>在「令牌管理」复制 Key（sk- 开头），用于请求鉴权</i></div></div>
+    <div class="doc-step"><span class="n">2</span><div><b>配置 Base URL</b><i>把客户端 Base URL 指向本站域名，其余代码无需改动</i></div></div>
+    <div class="doc-step"><span class="n">3</span><div><b>开始调用</b><i>按官方格式调用，模型名见「模型管理」</i></div></div>
+  </div>
+  <mdui-tabs id="docs-tabs" value="curl" full-width variant="secondary">
+    <mdui-tab value="curl">cURL</mdui-tab>
+    <mdui-tab value="openai">OpenAI SDK</mdui-tab>
+    <mdui-tab value="anthropic">Anthropic SDK</mdui-tab>
+    <mdui-tab-panel slot="panel" value="curl"><pre class="tut-code" id="doc-curl"></pre></mdui-tab-panel>
+    <mdui-tab-panel slot="panel" value="openai"><pre class="tut-code" id="doc-openai"></pre></mdui-tab-panel>
+    <mdui-tab-panel slot="panel" value="anthropic"><pre class="tut-code" id="doc-anthropic"></pre></mdui-tab-panel>
+  </mdui-tabs>
+  <mdui-button slot="action" variant="text" id="docs-close">关闭</mdui-button>
+  <mdui-button slot="action" variant="tonal" icon="content_copy" id="btn-docs-copy">复制当前示例</mdui-button>
+</mdui-dialog>
+
+<script>
+  // 源文件里的 Key：由 handler 在 /admin 响应中替换占位符；静态直连时回退到 config.js 的值
+  var INJECTED_KEY = "__FKAPI_KEY__";
+  var CONFIG_KEY = "sk-ZIK8Hygx0BLBOZmt7ZGOY4OcvqkttdIPvLEco7yHYtnKgDcu";
+  var API_KEY = INJECTED_KEY.indexOf("__FKAPI") === 0 ? CONFIG_KEY : INJECTED_KEY;
+
+  var ADMIN_USER = "admin123";
+  var ADMIN_PASS = "12345678";
+
+  var MODELS = [
+    "claude-sonnet-4-6", "claude-sonnet-4-7", "claude-sonnet-4-8", "claude-sonnet-5", "claude-sonnet-5-5",
+    "claude-opus-4-6", "claude-opus-4-7", "claude-opus-4-8", "claude-opus-5", "claude-opus-5-5",
+    "claude-fable-5", "claude-fable-5-1",
+    "gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna", "gpt-6-astra", "gpt-6-sol", "gpt-6-luna"
+  ];
+
+  function notify(msg) {
+    if (window.mdui && mdui.snackbar) {
+      mdui.snackbar({ message: msg, placement: "bottom-end" });
+    } else {
+      alert(msg);
+    }
+  }
+  if (window.mdui && mdui.setColorScheme) mdui.setColorScheme("#5b8cff");
+
+  function rnd(min, max) { return min + Math.random() * (max - min); }
+  function irnd(min, max) { return Math.floor(rnd(min, max + 1)); }
+  function money(n) { return "$" + n.toFixed(2); }
+  function kfmt(n) { return n >= 10000 ? (n / 1000).toFixed(1) + "k" : String(n); }
+  function pad(n) { return n < 10 ? "0" + n : String(n); }
+  function stamp(d) {
+    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + " " +
+      pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
+  }
+  function maskKey(k) { return k.slice(0, 8) + "••••••••••••••••••••" + k.slice(-6); }
+
+  var SITE_URL = "https://ai.n1ghtw1nd.com";
+  function siteBase() { return location.origin.indexOf("http") === 0 ? location.origin : SITE_URL; }
+
+  // 一次会话内数据保持稳定
+  var DATA_KEY = "fkadmin-data";
+  var DATA = null;
+  try { DATA = JSON.parse(sessionStorage.getItem(DATA_KEY) || "null"); } catch (e) {}
+  if (!DATA) {
+    var now = Date.now();
+    DATA = {
+      balance: rnd(2600, 3400),
+      usedTotal: rnd(1180, 1460),
+      todayReq: irnd(6200, 11800),
+      avgLatency: rnd(0.92, 1.74),
+      series: Array.apply(null, { length: 14 }).map(function () { return irnd(3200, 15200); }),
+      ratio: MODELS.slice(0, 6).map(function (m) { return { model: m, pct: 0 }; }),
+      tokens: [
+        { name: "默认令牌", key: API_KEY, used: rnd(420, 690), left: null, group: "default",
+          created: now - 86400000 * 47, expire: now + 86400000 * 318, last: now - irnd(60, 900) * 1000 }
+      ],
+      logs: Array.apply(null, { length: 42 }).map(function (_, i) {
+        var fail = Math.random() < 0.11;
+        return {
+          t: now - i * irnd(35, 420) * 1000,
+          stream: Math.random() < 0.72,
+          model: MODELS[irnd(0, MODELS.length - 1)],
+          pin: irnd(180, 4200), pout: irnd(120, 3600),
+          quota: rnd(0.004, 0.28), cost: rnd(0.42, 6.8), ttft: rnd(0.16, 1.4),
+          ip: irnd(36, 223) + "." + irnd(0, 255) + "." + irnd(0, 255) + "." + irnd(1, 254),
+          ok: !fail, err: fail ? ["upstream_timeout", "rate_limited", "bad_request"][irnd(0, 2)] : ""
+        };
+      }),
+      channels: [
+        { id: 1, name: "OpenAI 官方", type: "OpenAI" },
+        { id: 2, name: "Anthropic 官方", type: "Anthropic" },
+        { id: 3, name: "Azure 东日本", type: "OpenAI" },
+        { id: 4, name: "AWS Bedrock", type: "Anthropic" },
+        { id: 5, name: "自建中转池", type: "Mixed" }
+      ].map(function (c) {
+        var down = Math.random() < 0.18;
+        c.status = down ? "异常" : "正常";
+        c.latency = irnd(86, 640);
+        c.rate = down ? rnd(61, 88) : rnd(96.4, 99.9);
+        c.weight = irnd(10, 100);
+        c.today = rnd(28, 340);
+        return c;
+      })
+    };
+    var leftPct = 100;
+    DATA.ratio.forEach(function (r, i) {
+      var v = Math.max(3, Math.round(leftPct * rnd(0.18, 0.46)));
+      r.pct = Math.min(v, leftPct);
+      leftPct -= r.pct;
+    });
+    try { sessionStorage.setItem(DATA_KEY, JSON.stringify(DATA)); } catch (e) {}
+  }
+
+  /* ---------- 登录 ---------- */
+  var loginView = document.getElementById("view-login");
+  var appView = document.getElementById("view-app");
+  var captchaAnswer = 0;
+
+  function newCaptcha() {
+    var a = irnd(11, 89), b = irnd(10, 79);
+    captchaAnswer = a - b > 0 ? a - b : a + b;
+    var op = captchaAnswer === a - b ? "-" : "+";
+    document.getElementById("captcha-box").textContent = a + " " + op + " " + b + " =";
+  }
+  document.getElementById("captcha-box").addEventListener("click", newCaptcha);
+  newCaptcha();
+
+  var fails = 0;
+  var btnLogin = document.getElementById("btn-login");
+  function doLogin() {
+    var u = (document.getElementById("f-user").value || "").trim();
+    var p = document.getElementById("f-pass").value || "";
+    var c = (document.getElementById("f-captcha").value || "").trim();
+    if (!u || !p) return notify("请输入用户名和密码");
+    if (c === "" || Number(c) !== captchaAnswer) {
+      newCaptcha();
+      document.getElementById("f-captcha").value = "";
+      return notify("验证码错误");
+    }
+    btnLogin.loading = true;
+    setTimeout(function () {
+      btnLogin.loading = false;
+      if (u !== ADMIN_USER || p !== ADMIN_PASS) {
+        fails++;
+        newCaptcha();
+        document.getElementById("f-captcha").value = "";
+        return notify("用户名或密码错误" + (fails >= 3 ? "（剩余尝试 " + Math.max(0, 5 - fails) + " 次）" : ""));
+      }
+      try {
+        sessionStorage.setItem("fkadmin", "1");
+        if (document.getElementById("f-remember").checked) localStorage.setItem("fkadmin", "1");
+      } catch (e) {}
+      enterApp();
+    }, irnd(420, 900));
+  }
+  btnLogin.addEventListener("click", doLogin);
+  ["f-user", "f-pass", "f-captcha"].forEach(function (id) {
+    document.getElementById(id).addEventListener("keyup", function (ev) {
+      if (ev.key === "Enter") doLogin();
+    });
+  });
+  document.getElementById("link-forget").addEventListener("click", function (e) {
+    e.preventDefault();
+    notify("请联系管理员重置密码：114514@laofang.top");
+  });
+  document.getElementById("btn-oauth").addEventListener("click", function () {
+    notify("邀请码通道已关闭");
+  });
+  document.getElementById("btn-help").addEventListener("click", function () {
+    notify("文档：/docs · 状态：/health");
+  });
+
+  /* ---------- 视图切换 ---------- */
+  var TITLES = {
+    overview: "概览", tokens: "令牌管理", logs: "使用日志", models: "模型管理",
+    channels: "渠道状态", topup: "充值", account: "个人设置"
+  };
+  function show(view) {
+    Object.keys(TITLES).forEach(function (v) {
+      var el = document.getElementById("page-" + v);
+      if (el) el.hidden = v !== view;
+    });
+    document.getElementById("page-title").textContent = TITLES[view] || "";
+    document.querySelectorAll(".nav-item").forEach(function (n) {
+      n.classList.toggle("active", n.getAttribute("data-view") === view);
+    });
+    if (view === "channels") renderChannels();
+    closeSidebar();
+  }
+  document.querySelectorAll(".nav-item").forEach(function (n) {
+    n.addEventListener("click", function () { show(n.getAttribute("data-view")); });
+  });
+
+  var sidebar = document.getElementById("sidebar");
+  var sideMask = document.getElementById("side-mask");
+  function closeSidebar() { sidebar.classList.remove("open"); sideMask.hidden = true; }
+  document.getElementById("btn-menu").addEventListener("click", function () {
+    sidebar.classList.add("open");
+    sideMask.hidden = false;
+  });
+  sideMask.addEventListener("click", closeSidebar);
+
+  document.getElementById("btn-logout").addEventListener("click", function () {
+    try { sessionStorage.removeItem("fkadmin"); localStorage.removeItem("fkadmin"); } catch (e) {}
+    appView.hidden = true;
+    loginView.hidden = false;
+    document.getElementById("f-pass").value = "";
+    newCaptcha();
+    notify("已退出登录");
+  });
+
+  /* ---------- 主题 ---------- */
+  var THEME_KEY = "fkadmin-theme";
+  var themeBtn = document.getElementById("btn-theme");
+  var theme = "dark";
+  try { theme = localStorage.getItem(THEME_KEY) || "dark"; } catch (e) {}
+  function applyTheme() {
+    document.documentElement.className = "mdui-theme-" + theme;
+    themeBtn.setAttribute("icon", theme === "dark" ? "light_mode" : "dark_mode");
+  }
+  applyTheme();
+  themeBtn.addEventListener("click", function () {
+    theme = theme === "dark" ? "light" : "dark";
+    try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
+    applyTheme();
+  });
+
+  /* ---------- 渲染 ---------- */
+  function renderOverview() {
+    document.getElementById("side-balance").textContent = money(DATA.balance);
+    document.getElementById("topup-balance").textContent = money(DATA.balance);
+    document.getElementById("topup-total").textContent = money(rnd(1200, 2600));
+
+    var cards = [
+      { label: "今日请求", value: DATA.todayReq.toLocaleString("en-US"), icon: "query_stats", delta: "+" + rnd(3, 22).toFixed(1) + "%", up: true },
+      { label: "本月消耗额度", value: money(DATA.usedTotal), icon: "payments", delta: "+" + rnd(1, 9).toFixed(1) + "%", up: true },
+      { label: "账户余额", value: money(DATA.balance), icon: "account_balance_wallet", delta: "-" + rnd(0.4, 4).toFixed(1) + "%", up: false },
+      { label: "平均响应耗时", value: DATA.avgLatency.toFixed(2) + "s", icon: "speed", delta: "较昨日 -" + rnd(0.04, 0.28).toFixed(2) + "s", up: true }
+    ];
+    document.getElementById("stat-cards").innerHTML = cards.map(function (c) {
+      return '<mdui-card variant="outlined" class="panel stat">' +
+        '<div class="icon"><mdui-icon name="' + c.icon + '"></mdui-icon></div>' +
+        '<div class="label">' + c.label + '</div>' +
+        '<div class="value">' + c.value + '</div>' +
+        '<div class="delta ' + (c.up ? "up" : "down") + '">' +
+          '<mdui-icon name="' + (c.up ? "trending_up" : "trending_down") + '"></mdui-icon>' + c.delta +
+        '</div></mdui-card>';
+    }).join("");
+
+    var max = Math.max.apply(null, DATA.series);
+    var today = new Date();
+    document.getElementById("chart").innerHTML = DATA.series.map(function (v, i) {
+      var d = new Date(today.getTime() - (13 - i) * 86400000);
+      var h = Math.max(6, Math.round(v / max * 100));
+      return '<div class="col" title="' + (d.getMonth() + 1) + '/' + d.getDate() + ' · ' + v.toLocaleString("en-US") + ' 次">' +
+        '<div class="bar" style="height:' + h + '%"></div>' +
+        '<div class="x">' + (d.getMonth() + 1) + '/' + d.getDate() + '</div></div>';
+    }).join("");
+    var total = DATA.series.reduce(function (a, b) { return a + b; }, 0);
+    document.getElementById("chart-total").textContent = "合计 " + total.toLocaleString("en-US") + " 次";
+
+    document.getElementById("model-ratio").innerHTML = DATA.ratio.map(function (r) {
+      return '<div class="ratio"><div class="top"><span class="code mono">' + r.model + '</span>' +
+        '<span>' + r.pct + '%</span></div>' +
+        '<div class="track"><div class="fill" style="width:' + r.pct + '%"></div></div></div>';
+    }).join("");
+
+    document.getElementById("recent-logs").innerHTML = DATA.logs.slice(0, 6).map(function (l) {
+      return '<tr><td class="code mono">' + stamp(new Date(l.t)).slice(5) + '</td>' +
+        '<td><span class="code mono">' + l.model + '</span></td>' +
+        '<td class="num">' + money(l.quota) + '</td>' +
+        '<td class="num">' + l.cost.toFixed(2) + 's</td>' +
+        '<td>' + (l.ok ? '<span class="tag ok">成功</span>' : '<span class="tag warn">失败</span>') + '</td></tr>';
+    }).join("");
+
+    var base = siteBase();
+    document.getElementById("tut-base").textContent = base;
+    document.getElementById("tut-code").textContent =
+      "curl " + base + "/v1/chat/completions \\\n" +
+      '  -H "Authorization: Bearer $FKAPI_KEY" \\\n' +
+      '  -H "Content-Type: application/json" \\\n' +
+      '  -d \'{"model":"gpt-5.6-sol","messages":[{"role":"user","content":"你好"}]}\'';
+  }
+  function renderTokens() {
+    document.getElementById("token-rows").innerHTML = DATA.tokens.map(function (t, i) {
+      return '<tr>' +
+        '<td>' + t.name + '</td>' +
+        '<td><div class="key-cell"><code class="mono key-text" data-i="' + i + '">' + maskKey(t.key) + '</code>' +
+          '<mdui-button-icon class="btn-reveal" data-i="' + i + '" icon="visibility" style="width:32px;min-width:32px;height:32px"></mdui-button-icon>' +
+          '<mdui-button-icon class="btn-copy-key" data-i="' + i + '" icon="content_copy" style="width:32px;min-width:32px;height:32px"></mdui-button-icon>' +
+        '</div></td>' +
+        '<td class="num">' + money(t.used) + '</td>' +
+        '<td class="num">' + (t.left === null ? "不限" : money(t.left)) + '</td>' +
+        '<td><span class="tag mut">' + t.group + '</span></td>' +
+        '<td><code class="mono">' + SITE_URL + '</code></td>' +
+        '<td class="code mono">' + stamp(new Date(t.created)) + '</td>' +
+        '<td class="code mono">' + stamp(new Date(t.expire)) + '</td>' +
+        '<td class="code mono">' + stamp(new Date(t.last)) + '</td>' +
+        '<td><span class="tag ok">已启用</span></td>' +
+        '<td><div class="row-actions">' +
+          '<mdui-button-icon class="btn-edit-token" icon="edit" style="width:32px;min-width:32px;height:32px"></mdui-button-icon>' +
+          '<mdui-button-icon class="btn-del-token" icon="delete" style="width:32px;min-width:32px;height:32px"></mdui-button-icon>' +
+        '</div></td></tr>';
+    }).join("");
+
+    document.querySelectorAll(".key-text").forEach(function (el) {
+      var i = Number(el.getAttribute("data-i"));
+      var shown = false;
+      el.parentElement.querySelector(".btn-reveal").addEventListener("click", function () {
+        shown = !shown;
+        el.textContent = shown ? DATA.tokens[i].key : maskKey(DATA.tokens[i].key);
+        this.setAttribute("icon", shown ? "visibility_off" : "visibility");
+      });
+      el.parentElement.querySelector(".btn-copy-key").addEventListener("click", function () {
+        copyText(DATA.tokens[i].key, function (ok) { notify(ok ? "密钥已复制到剪贴板" : "复制失败，请手动选择"); });
+      });
+    });
+    document.querySelectorAll(".btn-edit-token").forEach(function (b) {
+      b.addEventListener("click", function () { notify("默认令牌由平台维护，不可编辑"); });
+    });
+    document.querySelectorAll(".btn-del-token").forEach(function (b) {
+      b.addEventListener("click", function () { notify("生产环境禁止删除默认令牌"); });
+    });
+  }
+
+  var LOG_SIZE = 15;
+  var LOG_PAGE = 1;
+
+  function renderLogs() {
+    var pages = Math.max(1, Math.ceil(DATA.logs.length / LOG_SIZE));
+    if (LOG_PAGE > pages) LOG_PAGE = pages;
+    if (LOG_PAGE < 1) LOG_PAGE = 1;
+    var start = (LOG_PAGE - 1) * LOG_SIZE;
+    document.getElementById("log-rows").innerHTML = DATA.logs.slice(start, start + LOG_SIZE).map(function (l) {
+      return '<tr>' +
+        '<td class="code mono">' + stamp(new Date(l.t)) + '</td>' +
+        '<td>' + (l.stream ? "流式" : "普通") + '</td>' +
+        '<td><span class="code mono">' + l.model + '</span></td>' +
+        '<td class="num">' + l.pin.toLocaleString("en-US") + '</td>' +
+        '<td class="num">' + l.pout.toLocaleString("en-US") + '</td>' +
+        '<td class="num">' + money(l.quota) + '</td>' +
+        '<td class="num">' + l.cost.toFixed(2) + 's</td>' +
+        '<td class="num">' + l.ttft.toFixed(2) + 's</td>' +
+        '<td class="code mono">' + l.ip + '</td>' +
+        '<td>' + (l.ok ? '<span class="tag ok">200</span>' : '<span class="tag warn">' + l.err + '</span>') + '</td></tr>';
+    }).join("");
+    document.getElementById("log-count").textContent =
+      "共 " + DATA.logs.length + " 条记录 · 每页 " + LOG_SIZE + " 条 · 第 " + LOG_PAGE + "/" + pages + " 页";
+
+    var html = ['<mdui-button variant="text" icon="chevron_left"' +
+      (LOG_PAGE === 1 ? " disabled" : "") + ' data-page="' + (LOG_PAGE - 1) + '">上一页</mdui-button>'];
+    for (var i = 1; i <= pages; i++) {
+      html.push('<mdui-button variant="' + (i === LOG_PAGE ? "filled" : "text") + '" data-page="' + i + '">' + i + "</mdui-button>");
+    }
+    html.push('<mdui-button variant="text" end-icon="chevron_right"' +
+      (LOG_PAGE === pages ? " disabled" : "") + ' data-page="' + (LOG_PAGE + 1) + '">下一页</mdui-button>');
+    var pager = document.getElementById("log-pager");
+    pager.innerHTML = html.join("");
+    pager.querySelectorAll("mdui-button").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var p = Number(b.getAttribute("data-page"));
+        if (!p || p < 1 || p > pages || p === LOG_PAGE) return;
+        LOG_PAGE = p;
+        renderLogs();
+      });
+    });
+  }
+
+  function renderModels() {
+    document.getElementById("model-rows").innerHTML = MODELS.map(function (m) {
+      var vendor = m.indexOf("claude") === 0 ? "Anthropic" : "OpenAI";
+      var off = Math.random() < 0.1;
+      return '<tr>' +
+        '<td><span class="code mono">' + m + '</span></td>' +
+        '<td>' + vendor + '</td>' +
+        '<td>' + (off ? '<span class="tag warn">已下线</span>' : '<span class="tag ok">可用</span>') + '</td>' +
+        '<td class="num">' + rnd(0.8, 3.2).toFixed(2) + '</td>' +
+        '<td class="num">' + rnd(2.4, 6.8).toFixed(2) + '</td>' +
+        '<td class="num">' + irnd(120, 3400).toLocaleString("en-US") + '</td>' +
+        '<td class="num">' + rnd(0.6, 3.4).toFixed(2) + 's</td>' +
+        '<td><span class="tag mut">default, vip</span></td></tr>';
+    }).join("");
+  }
+
+  function renderChannels() {
+    var minAgo = 999;
+    var rows = DATA.channels.map(function (c) {
+      var ago = irnd(20, 50);
+      if (ago < minAgo) minAgo = ago;
+      return '<tr>' +
+        '<td class="num">' + c.id + '</td>' +
+        '<td>' + c.name + '</td>' +
+        '<td>' + (c.status === "正常" ? '<span class="tag ok">正常</span>' : '<span class="tag warn">异常</span>') + '</td>' +
+        '<td class="num">' + c.latency + ' ms</td>' +
+        '<td class="num">' + c.rate.toFixed(1) + '%</td>' +
+        '<td class="num">' + c.weight + '</td>' +
+        '<td class="num">' + money(c.today) + '</td>' +
+        '<td class="code mono">' + ago + ' 秒前</td></tr>';
+    });
+    document.getElementById("channel-rows").innerHTML = rows.join("");
+    document.getElementById("channel-updated").textContent =
+      "最近自动巡检 " + stamp(new Date(Date.now() - minAgo * 1000));
+  }
+
+  /* ---------- 复制 ---------- */
+  function copyText(text, onDone) {
+    var fallback = function () {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); onDone(true); }
+      catch (e) { onDone(false); }
+      document.body.removeChild(ta);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { onDone(true); }, fallback);
+    } else {
+      fallback();
+    }
+  }
+
+  /* ---------- 杂项交互 ---------- */
+  document.getElementById("btn-sync-token").addEventListener("click", function () {
+    notify("已与上游同步 " + DATA.tokens.length + " 个令牌");
+  });
+  document.getElementById("btn-add-model").addEventListener("click", function () {
+    notify("模型由管理员统一维护");
+  });
+  document.getElementById("btn-export").addEventListener("click", function () {
+    notify("体验账号暂不支持导出调用数据");
+  });
+  document.getElementById("btn-tut-copy").addEventListener("click", function () {
+    copyText(document.getElementById("tut-code").textContent, function (ok) {
+      notify(ok ? "示例已复制" : "复制失败，请手动选择");
+    });
+  });
+  document.getElementById("btn-upgrade").addEventListener("click", function () {
+    notify("正式版请联系管理员开通（注册通道维护中）");
+  });
+  document.getElementById("btn-more-logs").addEventListener("click", function () { show("logs"); });
+
+  /* 完整接入文档弹窗（内容与主页接入教程一致） */
+  var docsDialog = document.getElementById("docs-dialog");
+  function renderDocs() {
+    var base = siteBase();
+    document.getElementById("doc-curl").textContent =
+      "curl " + base + "/v1/chat/completions \\\n" +
+      '  -H "Authorization: Bearer $FKAPI_KEY" \\\n' +
+      '  -H "Content-Type: application/json" \\\n' +
+      "  -d '{\n" +
+      '    "model": "claude-sonnet-5",\n' +
+      '    "messages": [{"role": "user", "content": "你好"}],\n' +
+      '    "stream": true\n' +
+      "  }'";
+    document.getElementById("doc-openai").textContent =
+      "from openai import OpenAI\n\n" +
+      "client = OpenAI(\n" +
+      '    api_key="sk-xxxxxxxxxxxxxxxx",\n' +
+      '    base_url="' + base + '/v1",\n' +
+      ")\n\n" +
+      "resp = client.chat.completions.create(\n" +
+      '    model="gpt-5.6-sol",\n' +
+      '    messages=[{"role": "user", "content": "你好"}],\n' +
+      ")\n" +
+      "print(resp.choices[0].message.content)";
+    document.getElementById("doc-anthropic").textContent =
+      "import anthropic\n\n" +
+      "client = anthropic.Anthropic(\n" +
+      '    api_key="sk-xxxxxxxxxxxxxxxx",\n' +
+      '    base_url="' + base + '",\n' +
+      ")\n\n" +
+      "msg = client.messages.create(\n" +
+      '    model="claude-opus-5",\n' +
+      "    max_tokens=1024,\n" +
+      '    messages=[{"role": "user", "content": "你好"}],\n' +
+      ")\n" +
+      "print(msg.content[0].text)";
+  }
+  document.getElementById("btn-docs").addEventListener("click", function () {
+    renderDocs();
+    docsDialog.open = true;
+  });
+  document.getElementById("docs-close").addEventListener("click", function () {
+    docsDialog.open = false;
+  });
+  document.getElementById("btn-docs-copy").addEventListener("click", function () {
+    var pre = document.getElementById("doc-" + (document.getElementById("docs-tabs").value || "curl"));
+    copyText(pre.textContent, function (ok) {
+      notify(ok ? "示例已复制" : "复制失败，请手动选择");
+    });
+  });
+  document.getElementById("btn-quick-topup").addEventListener("click", function () {
+    show("topup");
+    notify("充值通道已关闭，余额可正常消耗");
+  });
+
+  /* ---------- 进入后台 ---------- */
+  var rendered = false;
+  function enterApp() {
+    loginView.hidden = true;
+    appView.hidden = false;
+    if (!rendered) {
+      renderOverview();
+      renderTokens();
+      renderLogs();
+      renderModels();
+      renderChannels();
+      rendered = true;
+    }
+    show("overview");
+    notify("欢迎回来，admin123 · 当前为体验账号");
+  }
+
+  var logged = false;
+  try { logged = sessionStorage.getItem("fkadmin") === "1" || localStorage.getItem("fkadmin") === "1"; } catch (e) {}
+  if (logged) enterApp();
+</script>
+</body>
+</html>
