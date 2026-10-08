@@ -758,9 +758,44 @@
   }
   function maskKey(k) { return k.slice(0, 8) + "••••••••••••••••••••" + k.slice(-6); }
 
-  var IS_LOGIN_PATH = /\/(login|signin)\/?$/i.test(location.pathname);
-  var IS_CONSOLE_PATH = /\/(admin|console)\/?$/i.test(location.pathname);
-  var PEER_PATH = location.pathname.replace(/[^/]*$/, "") + (IS_LOGIN_PATH ? "admin" : "login");
+  // 兼容 /login、/login.html 以及子目录部署；存储被禁用时用 URL 里的 k 参数续命
+  var PATH_NO_EXT = location.pathname.replace(/\.html$/i, "");
+  var IS_LOGIN_PATH = /\/(login|signin)$/i.test(PATH_NO_EXT);
+  var IS_CONSOLE_PATH = /\/(admin|console)$/i.test(PATH_NO_EXT);
+  function peerPath(target) {
+    var m = PATH_NO_EXT.match(/^(.*\/)(?:login|signin|admin|console)$/i);
+    return m ? m[1] + target : null;
+  }
+  var LOGIN_PEER = peerPath("login");
+  var CONSOLE_PEER = peerPath("admin");
+
+  var FLAG_KEY = "fkadmin";
+  function storeWorks() {
+    try { sessionStorage.setItem("__t", "1"); sessionStorage.removeItem("__t"); return true; }
+    catch (e) { return false; }
+  }
+  function djb2(str) {
+    var h = 5381;
+    for (var i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) >>> 0;
+    return h.toString(36);
+  }
+  // 只是防呆跳转，不是安全机制（凭据本来就写在前端）
+  var AUTH_TOKEN = djb2("nbai-admin");
+  function readFlag() {
+    try { return sessionStorage.getItem(FLAG_KEY) === "1" || localStorage.getItem(FLAG_KEY) === "1"; }
+    catch (e) { return false; }
+  }
+  function writeFlag(remember) {
+    try { sessionStorage.setItem(FLAG_KEY, "1"); } catch (e) {}
+    try { if (remember) localStorage.setItem(FLAG_KEY, "1"); } catch (e) {}
+  }
+  function clearFlag() {
+    try { sessionStorage.removeItem(FLAG_KEY); localStorage.removeItem(FLAG_KEY); } catch (e) {}
+  }
+  function tokenOk() {
+    try { return new URLSearchParams(location.search).get("k") === AUTH_TOKEN; } catch (e) { return false; }
+  }
+  var STORE_OK = storeWorks();
 
   var SITE_URL = "https://ai.n1ghtw1nd.com";
   function siteBase() { return location.origin.indexOf("http") === 0 ? location.origin : SITE_URL; }
@@ -854,11 +889,8 @@
         document.getElementById("f-captcha").value = "";
         return notify("用户名或密码错误" + (fails >= 3 ? "（剩余尝试 " + Math.max(0, 5 - fails) + " 次）" : ""));
       }
-      try {
-        sessionStorage.setItem("fkadmin", "1");
-        if (document.getElementById("f-remember").checked) localStorage.setItem("fkadmin", "1");
-      } catch (e) {}
-      if (IS_LOGIN_PATH) location.href = PEER_PATH;
+      writeFlag(document.getElementById("f-remember").checked);
+      if (IS_LOGIN_PATH && CONSOLE_PEER) location.href = CONSOLE_PEER + "?k=" + AUTH_TOKEN;
       else enterApp();
     }, irnd(420, 900));
   }
@@ -904,8 +936,8 @@
   sideMask.addEventListener("click", closeSidebar);
 
   document.getElementById("btn-logout").addEventListener("click", function () {
-    try { sessionStorage.removeItem("fkadmin"); localStorage.removeItem("fkadmin"); } catch (e) {}
-    if (IS_CONSOLE_PATH) { location.href = PEER_PATH; return; }
+    clearFlag();
+    if (IS_CONSOLE_PATH && LOGIN_PEER) { location.href = LOGIN_PEER; return; }
     appView.hidden = true;
     loginView.hidden = false;
     document.getElementById("f-pass").value = "";
@@ -1223,11 +1255,16 @@
     notify("欢迎回来，admin123 · 当前为体验账号");
   }
 
-  var logged = false;
-  try { logged = sessionStorage.getItem("fkadmin") === "1" || localStorage.getItem("fkadmin") === "1"; } catch (e) {}
-  if (IS_LOGIN_PATH && logged) location.replace(PEER_PATH);
-  else if (IS_CONSOLE_PATH && !logged) location.replace(PEER_PATH);
-  else if (logged) enterApp();
+  var logged = readFlag() || tokenOk();
+  if (logged && !STORE_OK) { try { sessionStorage.setItem(FLAG_KEY, "1"); } catch (e) {} }
+  if (IS_LOGIN_PATH && logged && CONSOLE_PEER) {
+    location.replace(CONSOLE_PEER + "?k=" + AUTH_TOKEN);
+  } else if (IS_CONSOLE_PATH && !logged && LOGIN_PEER) {
+    location.replace(LOGIN_PEER);
+  } else if (logged) {
+    if (tokenOk() && history.replaceState) history.replaceState(null, "", location.pathname);
+    enterApp();
+  }
 </script>
 </body>
 </html>
