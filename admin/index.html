@@ -62,8 +62,17 @@
   .captcha-row mdui-text-field { flex: 1; margin-bottom: 0; }
   .captcha-box {
     box-sizing: border-box;
-    display: flex; align-items: center; gap: 6px;
-    height: 56px;
+    flex: none;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    height: 56px; padding: 0 16px;
+    border-radius: var(--mdui-shape-corner-small);
+    border: 1px solid rgb(var(--mdui-color-outline));
+    background: rgb(var(--mdui-color-surface-container-low));
+    font-family: "SF Mono", Consolas, Menlo, monospace;
+    font-size: 17px; font-weight: 700; letter-spacing: 2px;
+    color: rgb(var(--mdui-color-on-surface));
+    -webkit-user-select: none; user-select: none;
+    cursor: pointer; white-space: nowrap;
   }
   .login-row {
     display: flex; align-items: center; justify-content: space-between;
