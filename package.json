@@ -8,6 +8,7 @@
     "start": "node server.js",
     "dev": "node server.js",
     "build:ascii": "node scripts/gen-ascii-manifest.js",
+    "build:static": "node scripts/gen-static-pages.js",
     "dev:cf": "node scripts/gen-ascii-manifest.js && wrangler dev",
     "deploy:cf": "node scripts/gen-ascii-manifest.js && wrangler deploy"
   },
