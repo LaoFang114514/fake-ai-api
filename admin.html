@@ -79,8 +79,6 @@
     font-size: 13px; margin: 2px 0 20px;
     color: rgb(var(--mdui-color-on-surface-variant));
   }
-  .login-tip { text-align: center; font-size: 12px; margin-top: 16px; color: rgb(var(--mdui-color-on-surface-variant)); }
-  .login-version { text-align: center; font-size: 12px; margin-top: 18px; color: rgb(var(--mdui-color-on-surface-variant)); opacity: .75; }
 
   /* ---------- 控制台骨架 ---------- */
   .sidebar {
@@ -400,8 +398,6 @@
 
     <mdui-button id="btn-login" variant="filled" full-width>登 录</mdui-button>
 
-    <div class="login-tip">连续 5 次失败将锁定账号 15 分钟</div>
-    <div class="login-version">nb-ai v1.7.2 · 服务器时区 UTC+8</div>
   </mdui-card>
 </div>
 
@@ -878,7 +874,6 @@
   document.getElementById("captcha-box").addEventListener("click", newCaptcha);
   newCaptcha();
 
-  var fails = 0;
   var btnLogin = document.getElementById("btn-login");
   function doLogin() {
     var u = (document.getElementById("f-user").value || "").trim();
@@ -894,10 +889,9 @@
     setTimeout(function () {
       btnLogin.loading = false;
       if (u !== ADMIN_USER || p !== ADMIN_PASS) {
-        fails++;
         newCaptcha();
         document.getElementById("f-captcha").value = "";
-        return notify("用户名或密码错误" + (fails >= 3 ? "（剩余尝试 " + Math.max(0, 5 - fails) + " 次）" : ""));
+        return notify("用户名或密码错误");
       }
       writeFlag(document.getElementById("f-remember").checked);
       if (IS_LOGIN_PATH && CONSOLE_PEER) location.href = CONSOLE_PEER + "?k=" + AUTH_TOKEN;
