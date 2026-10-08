@@ -1,4 +1,4 @@
 User-agent: *
 Disallow: /v1/
 Disallow: /api/
-Sitemap: https://www.niubiai.cloud-ip.cc/sitemap.xml
+Sitemap: http://niubiai.cc.cd/sitemap.xml
