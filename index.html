@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="renderer" content="webkit">
-<title>FkAPI - AI API 中转站</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+<title>nb-ai - AI API 中转站</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐮</text></svg>">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@2.1.5/mdui.css"
       onerror="this.onerror=null;this.href='https://registry.npmmirror.com/mdui/2.1.5/files/mdui.css'">
@@ -56,13 +56,13 @@
     color: rgb(var(--mdui-color-on-surface));
   }
   .logo .mark {
-    width: 30px; height: 30px;
-    border-radius: var(--mdui-shape-corner-small);
+    width: 32px; height: 32px;
+    border-radius: var(--mdui-shape-corner-medium);
     background: linear-gradient(135deg, rgb(var(--mdui-color-primary)), rgb(var(--mdui-color-tertiary)));
     display: flex; align-items: center; justify-content: center;
-    color: rgb(var(--mdui-color-on-primary));
+    overflow: hidden;
+    font-size: 18px; line-height: 1;
   }
-  .logo .mark mdui-icon { font-size: 18px; }
   .nav-links { display: flex; align-items: center; gap: 4px; }
   mdui-dropdown { display: none; }
   mdui-menu:not(:defined) { display: none; }
@@ -139,7 +139,6 @@
   /* 卡片栅格 */
   .model-groups { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
   .feature-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-  .step-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 
   mdui-card {
     padding: 26px;
@@ -159,37 +158,24 @@
   .feature h4 { font-size: 16px; margin-bottom: 6px; color: rgb(var(--mdui-color-on-surface)); }
   .feature p { font-size: 13px; color: rgb(var(--mdui-color-on-surface-variant)); }
 
-  .step { position: relative; }
-  .step .idx {
-    width: 26px; height: 26px; border-radius: var(--mdui-shape-corner-full);
-    background: linear-gradient(135deg, rgb(var(--mdui-color-primary)), rgb(var(--mdui-color-tertiary)));
-    color: rgb(var(--mdui-color-on-primary));
-    font-size: 13px; font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 10px;
+  @media (max-width: 480px) {
+    .container { padding: 0 16px; }
+    section { padding: 44px 0; }
+    .hero { padding: 44px 0 32px; }
+    .hero h1 { font-size: 26px; }
+    .hero .lead { font-size: 15px; margin: 14px auto 22px; }
+    .base-url-box { flex-wrap: wrap; justify-content: center; gap: 8px; padding: 10px 10px 10px 14px; }
+    .base-url-box code { font-size: 12.5px; word-break: break-all; }
+    .hero .btns { gap: 10px; }
+    .hero .btns mdui-button { flex: 1 1 46%; }
+    .stats { gap: 20px 28px; }
+    .stats .num { font-size: 23px; }
+    .section-title { font-size: 23px; }
+    .section-sub { font-size: 13px; margin-bottom: 28px; }
+    mdui-card { padding: 20px; }
+    .banner { font-size: 12px; }
   }
-  .step h4 { font-size: 15px; margin-bottom: 6px; color: rgb(var(--mdui-color-on-surface)); }
-  .step p { font-size: 13px; color: rgb(var(--mdui-color-on-surface-variant)); }
 
-  /* 接入示例 */
-  .code-card { display: block; margin-top: 24px; padding: 0; overflow: hidden; }
-  .code-head {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 12px; padding: 10px 10px 10px 20px;
-    border-bottom: 1px solid rgb(var(--mdui-color-outline-variant));
-    background: rgb(var(--mdui-color-surface-container));
-  }
-  .code-head .hint { font-size: 13px; color: rgb(var(--mdui-color-on-surface-variant)); }
-  pre {
-    margin: 0;
-    padding: 20px;
-    font-size: 13px;
-    line-height: 1.7;
-    overflow-x: auto;
-    color: rgb(var(--mdui-color-on-surface-variant));
-    font-family: "SF Mono", Consolas, Menlo, monospace;
-    background: rgb(var(--mdui-color-surface-container-low));
-  }
   footer {
     border-top: 1px solid rgb(var(--mdui-color-outline-variant));
     padding: 26px 0;
@@ -202,7 +188,7 @@
   @media (max-width: 900px) {
     .nav-links { display: none; }
     mdui-dropdown { display: block; }
-    .model-groups, .feature-grid, .step-grid { grid-template-columns: 1fr; }
+    .model-groups, .feature-grid { grid-template-columns: 1fr; }
     .hero h1 { font-size: 30px; }
     .hero { padding: 56px 0 40px; }
     .stats { gap: 28px; }
@@ -213,13 +199,12 @@
 
 <mdui-top-app-bar scroll-behavior="elevate" scroll-threshold="20">
   <div class="logo">
-    <span class="mark"><mdui-icon name="bolt"></mdui-icon></span>
-    <span>FkAPI</span>
+    <span class="mark">🐮</span>
+    <span>nb-ai</span>
   </div>
   <div class="nav-links">
     <mdui-button variant="text" href="#models">模型</mdui-button>
     <mdui-button variant="text" href="#features">服务优势</mdui-button>
-    <mdui-button variant="text" href="#docs">接入文档</mdui-button>
     <mdui-button variant="text" id="nav-announce">公告</mdui-button>
   </div>
   <div style="flex-grow: 1"></div>
@@ -228,12 +213,11 @@
     <mdui-menu>
       <mdui-menu-item href="#models">模型</mdui-menu-item>
       <mdui-menu-item href="#features">服务优势</mdui-menu-item>
-      <mdui-menu-item href="#docs">接入文档</mdui-menu-item>
       <mdui-menu-item id="menu-announce">公告</mdui-menu-item>
     </mdui-menu>
   </mdui-dropdown>
   <mdui-button-icon id="btn-theme" icon="light_mode"></mdui-button-icon>
-  <mdui-button variant="text" href="/admin" id="btn-login">登录</mdui-button>
+  <mdui-button variant="text" href="/login" id="btn-login">登录</mdui-button>
   <mdui-button variant="tonal" id="btn-register">注册</mdui-button>
 </mdui-top-app-bar>
 
@@ -253,8 +237,7 @@
       </div>
       <p class="lead">一个 Key 接入 GPT-5.6、Claude 全系模型，稳定高速、按量计费，支持流式输出，兼容 OpenAI / Anthropic 官方接口格式。</p>
       <div class="btns">
-        <mdui-button variant="filled" href="#docs" end-icon="arrow_forward">查看接入文档</mdui-button>
-        <mdui-button variant="outlined" href="#models">浏览模型</mdui-button>
+        <mdui-button variant="filled" href="#models" end-icon="arrow_forward">浏览模型</mdui-button>
       </div>
       <div class="stats">
         <div><div class="num">99.9%</div><div class="label">服务可用率</div></div>
@@ -330,96 +313,11 @@
     </div>
   </section>
 
-  <section id="docs">
-    <div class="container">
-      <div class="section-title">接入文档</div>
-      <div class="section-sub">完全兼容 OpenAI / Anthropic 官方格式，三分钟完成接入</div>
-      <div class="step-grid">
-        <mdui-card variant="outlined" class="step">
-          <div class="idx">1</div>
-          <h4>获取 API Key</h4>
-          <p>登录控制台生成 Key（sk- 开头），用于请求鉴权。</p>
-        </mdui-card>
-        <mdui-card variant="outlined" class="step">
-          <div class="idx">2</div>
-          <h4>配置 Base URL</h4>
-          <p>将客户端的 Base URL 指向部署域名，无需修改其他代码。</p>
-        </mdui-card>
-        <mdui-card variant="outlined" class="step">
-          <div class="idx">3</div>
-          <h4>开始调用</h4>
-          <p>像调用官方 API 一样使用，模型名见上方列表。</p>
-        </mdui-card>
-      </div>
-
-      <mdui-card variant="outlined" class="code-card">
-        <mdui-tabs value="curl" full-width>
-          <mdui-tab value="curl" icon="terminal">cURL</mdui-tab>
-          <mdui-tab value="openai" icon="code">OpenAI SDK</mdui-tab>
-          <mdui-tab value="anthropic" icon="code">Anthropic SDK</mdui-tab>
-
-          <mdui-tab-panel slot="panel" value="curl" class="code-panel">
-            <div class="code-head">
-              <span class="hint">POST /v1/chat/completions</span>
-              <mdui-button variant="text" icon="content_copy" data-copy="curl">复制</mdui-button>
-            </div>
-<pre id="code-curl">curl https://ai.n1ghtw1nd.com/v1/chat/completions \
-  -H "Authorization: Bearer $FKAPI_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "claude-sonnet-5",
-    "messages": [{"role": "user", "content": "你好"}],
-    "stream": true
-  }'</pre>
-          </mdui-tab-panel>
-
-          <mdui-tab-panel slot="panel" value="openai" class="code-panel">
-            <div class="code-head">
-              <span class="hint">Python · openai>=1.0</span>
-              <mdui-button variant="text" icon="content_copy" data-copy="openai">复制</mdui-button>
-            </div>
-<pre id="code-openai">from openai import OpenAI
-
-client = OpenAI(
-    api_key="sk-xxxxxxxxxxxxxxxx",
-    base_url="https://ai.n1ghtw1nd.com/v1",
-)
-
-resp = client.chat.completions.create(
-    model="gpt-5.6-sol",
-    messages=[{"role": "user", "content": "你好"}],
-)
-print(resp.choices[0].message.content)</pre>
-          </mdui-tab-panel>
-
-          <mdui-tab-panel slot="panel" value="anthropic" class="code-panel">
-            <div class="code-head">
-              <span class="hint">POST /v1/messages</span>
-              <mdui-button variant="text" icon="content_copy" data-copy="anthropic">复制</mdui-button>
-            </div>
-<pre id="code-anthropic">import anthropic
-
-client = anthropic.Anthropic(
-    api_key="sk-xxxxxxxxxxxxxxxx",
-    base_url="https://ai.n1ghtw1nd.com",
-)
-
-msg = client.messages.create(
-    model="claude-opus-5",
-    max_tokens=1024,
-    messages=[{"role": "user", "content": "你好"}],
-)
-print(msg.content[0].text)</pre>
-          </mdui-tab-panel>
-        </mdui-tabs>
-      </mdui-card>
-    </div>
-  </section>
 </main>
 
 <footer>
   <div class="container inner">
-    <span>© 2026 FkAPI</span>
+    <span>© 2026 nb-ai</span>
     <mdui-button variant="text" href="https://github.com/XTxiaoting14332/fake-ai-api" target="_blank" rel="noopener">
       <svg slot="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
       GitHub
@@ -489,14 +387,6 @@ print(msg.content[0].text)</pre>
     });
   });
 
-  document.querySelectorAll("[data-copy]").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      var pre = document.getElementById("code-" + btn.getAttribute("data-copy"));
-      copyText(pre.textContent, function (ok) {
-        notify(ok ? "代码已复制" : "复制失败，请手动复制");
-      });
-    });
-  });
 
   document.getElementById("btn-register").addEventListener("click", function () {
     notify("暂未开放注册");

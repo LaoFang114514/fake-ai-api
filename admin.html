@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="renderer" content="webkit">
 <meta name="robots" content="noindex, nofollow">
-<title>控制台 - FkAPI</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+<title>控制台 - nb-ai</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐮</text></svg>">
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@2.1.5/mdui.css"
       onerror="this.onerror=null;this.href='https://registry.npmmirror.com/mdui/2.1.5/files/mdui.css'">
@@ -45,13 +45,13 @@
   .login-brand { display: flex; align-items: center; gap: 10px; justify-content: center; }
   .mark {
     width: 34px; height: 34px;
-    border-radius: var(--mdui-shape-corner-small);
+    border-radius: var(--mdui-shape-corner-medium);
     background: linear-gradient(135deg, rgb(var(--mdui-color-primary)), rgb(var(--mdui-color-tertiary)));
     display: flex; align-items: center; justify-content: center;
-    color: rgb(var(--mdui-color-on-primary));
+    overflow: hidden;
+    font-size: 19px; line-height: 1;
     flex: none;
   }
-  .mark mdui-icon { font-size: 20px; }
   .login-brand .name { font-size: 21px; font-weight: 700; color: rgb(var(--mdui-color-on-surface)); }
   .login-sub {
     text-align: center; font-size: 13px; margin: 6px 0 26px;
@@ -286,6 +286,17 @@
   .toolbar .grow { flex: 1; }
   .toolbar mdui-text-field, .toolbar mdui-select { min-width: 168px; }
 
+  .call-url {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px; padding: 10px 14px;
+    border-radius: var(--mdui-shape-corner-medium);
+    background: rgb(var(--mdui-color-surface-container));
+    border: 1px solid rgb(var(--mdui-color-outline-variant));
+    font-size: 13px;
+  }
+  .call-url .label { color: rgb(var(--mdui-color-on-surface-variant)); }
+  .call-url code { color: rgb(var(--mdui-color-on-surface)); }
+
   .form-row { margin-bottom: 16px; }
   .form-row mdui-text-field { display: block; width: 100%; max-width: 420px; }
   .form-row .desc { font-size: 12px; color: rgb(var(--mdui-color-on-surface-variant)); margin-top: 4px; }
@@ -341,6 +352,27 @@
     .pages { padding: 16px; }
   }
   @media (max-width: 620px) { .g4 { grid-template-columns: 1fr; } .login-card { padding: 26px 20px 20px; } }
+  @media (max-width: 480px) {
+    .pages { padding: 12px; }
+    .panel { padding: 16px; }
+    .stat .value { font-size: 23px; }
+    .balance-big { font-size: 28px; }
+    .chart { height: 140px; gap: 4px; }
+    .chart .x { font-size: 9px; }
+    .topbar { padding: 0 12px; gap: 6px; }
+    .topbar h1 { font-size: 16px; }
+    td, th { padding: 9px 8px; }
+    .captcha-row { flex-direction: column; align-items: stretch; }
+    .captcha-box { height: 46px; justify-content: center; }
+    .login-card { padding: 22px 16px 16px; }
+    .mask-note .box { padding: 14px 16px; }
+    .mask-note .desc { max-width: 250px; }
+    mdui-dialog { padding: 12px; }
+  }
+  @media (max-width: 380px) {
+    .topbar .tag.mut, .chip-status { display: none; }
+    .call-url { flex-wrap: wrap; }
+  }
 </style>
 </head>
 <body>
@@ -349,8 +381,8 @@
 <div id="view-login" class="login-wrap">
   <mdui-card variant="elevated" class="login-card">
     <div class="login-brand">
-      <span class="mark"><mdui-icon name="bolt"></mdui-icon></span>
-      <span class="name">FkAPI 控制台</span>
+      <span class="mark">🐮</span>
+      <span class="name">nb-ai 控制台</span>
     </div>
     <div class="login-sub">AI 模型接口中转服务 · 管理后台</div>
 
@@ -371,10 +403,9 @@
 
     <div class="login-foot">
       <mdui-button variant="tonal" icon="tag" id="btn-oauth">使用邀请码登录</mdui-button>
-      <mdui-button variant="text" icon="help" id="btn-help">帮助</mdui-button>
     </div>
     <div class="login-tip">连续 5 次失败将锁定账号 15 分钟</div>
-    <div class="login-version">FkAPI v1.7.2 · 服务器时区 UTC+8</div>
+    <div class="login-version">nb-ai v1.7.2 · 服务器时区 UTC+8</div>
   </mdui-card>
 </div>
 
@@ -382,8 +413,8 @@
 <div id="view-app" hidden>
   <aside class="sidebar" id="sidebar">
     <div class="side-head">
-      <span class="mark"><mdui-icon name="bolt"></mdui-icon></span>
-      <span>FkAPI</span>
+      <span class="mark">🐮</span>
+      <span>nb-ai</span>
     </div>
     <nav class="side-nav">
       <div class="group">数据</div>
@@ -491,10 +522,15 @@
             <div class="grow"></div>
             <mdui-text-field variant="outlined" icon="search" label="搜索令牌名称" dense clearable></mdui-text-field>
           </div>
+          <div class="call-url">
+            <span class="label">调用链接</span>
+            <code class="mono" id="call-url"></code>
+            <mdui-button-icon id="btn-copy-url" icon="content_copy"></mdui-button-icon>
+          </div>
           <div class="table-wrap"><table>
             <thead><tr>
               <th>名称</th><th>密钥</th><th class="num">已用额度</th><th class="num">剩余额度</th>
-              <th>分组</th><th>接入网站</th><th>创建时间</th><th>到期时间</th><th>最后使用</th><th>状态</th><th>操作</th>
+              <th>分组</th><th>创建时间</th><th>到期时间</th><th>最后使用</th><th>状态</th><th>操作</th>
             </tr></thead>
             <tbody id="token-rows"></tbody>
           </table></div>
@@ -735,6 +771,10 @@
   }
   function maskKey(k) { return k.slice(0, 8) + "••••••••••••••••••••" + k.slice(-6); }
 
+  var IS_LOGIN_PATH = /\/(login|signin)\/?$/i.test(location.pathname);
+  var IS_CONSOLE_PATH = /\/(admin|console)\/?$/i.test(location.pathname);
+  var PEER_PATH = location.pathname.replace(/[^/]*$/, "") + (IS_LOGIN_PATH ? "admin" : "login");
+
   var SITE_URL = "https://ai.n1ghtw1nd.com";
   function siteBase() { return location.origin.indexOf("http") === 0 ? location.origin : SITE_URL; }
 
@@ -831,7 +871,8 @@
         sessionStorage.setItem("fkadmin", "1");
         if (document.getElementById("f-remember").checked) localStorage.setItem("fkadmin", "1");
       } catch (e) {}
-      enterApp();
+      if (IS_LOGIN_PATH) location.href = PEER_PATH;
+      else enterApp();
     }, irnd(420, 900));
   }
   btnLogin.addEventListener("click", doLogin);
@@ -846,9 +887,6 @@
   });
   document.getElementById("btn-oauth").addEventListener("click", function () {
     notify("邀请码通道已关闭");
-  });
-  document.getElementById("btn-help").addEventListener("click", function () {
-    notify("文档：/docs · 状态：/health");
   });
 
   /* ---------- 视图切换 ---------- */
@@ -883,6 +921,7 @@
 
   document.getElementById("btn-logout").addEventListener("click", function () {
     try { sessionStorage.removeItem("fkadmin"); localStorage.removeItem("fkadmin"); } catch (e) {}
+    if (IS_CONSOLE_PATH) { location.href = PEER_PATH; return; }
     appView.hidden = true;
     loginView.hidden = false;
     document.getElementById("f-pass").value = "";
@@ -958,11 +997,17 @@
     document.getElementById("tut-base").textContent = base;
     document.getElementById("tut-code").textContent =
       "curl " + base + "/v1/chat/completions \\\n" +
-      '  -H "Authorization: Bearer $FKAPI_KEY" \\\n' +
+      '  -H "Authorization: Bearer $NBAI_KEY" \\\n' +
       '  -H "Content-Type: application/json" \\\n' +
       '  -d \'{"model":"gpt-5.6-sol","messages":[{"role":"user","content":"你好"}]}\'';
   }
   function renderTokens() {
+    document.getElementById("call-url").textContent = SITE_URL;
+    document.getElementById("btn-copy-url").addEventListener("click", function () {
+      copyText(SITE_URL, function (ok) {
+        notify(ok ? "调用链接已复制" : "复制失败，请手动选择");
+      });
+    });
     document.getElementById("token-rows").innerHTML = DATA.tokens.map(function (t, i) {
       return '<tr>' +
         '<td>' + t.name + '</td>' +
@@ -973,7 +1018,6 @@
         '<td class="num">' + money(t.used) + '</td>' +
         '<td class="num">' + (t.left === null ? "不限" : money(t.left)) + '</td>' +
         '<td><span class="tag mut">' + t.group + '</span></td>' +
-        '<td><code class="mono">' + SITE_URL + '</code></td>' +
         '<td class="code mono">' + stamp(new Date(t.created)) + '</td>' +
         '<td class="code mono">' + stamp(new Date(t.expire)) + '</td>' +
         '<td class="code mono">' + stamp(new Date(t.last)) + '</td>' +
@@ -1129,7 +1173,7 @@
     var base = siteBase();
     document.getElementById("doc-curl").textContent =
       "curl " + base + "/v1/chat/completions \\\n" +
-      '  -H "Authorization: Bearer $FKAPI_KEY" \\\n' +
+      '  -H "Authorization: Bearer $NBAI_KEY" \\\n' +
       '  -H "Content-Type: application/json" \\\n' +
       "  -d '{\n" +
       '    "model": "claude-sonnet-5",\n' +
@@ -1197,7 +1241,9 @@
 
   var logged = false;
   try { logged = sessionStorage.getItem("fkadmin") === "1" || localStorage.getItem("fkadmin") === "1"; } catch (e) {}
-  if (logged) enterApp();
+  if (IS_LOGIN_PATH && logged) location.replace(PEER_PATH);
+  else if (IS_CONSOLE_PATH && !logged) location.replace(PEER_PATH);
+  else if (logged) enterApp();
 </script>
 </body>
 </html>
