@@ -64,8 +64,6 @@
     font-size: 18px; line-height: 1;
   }
   .nav-links { display: flex; align-items: center; gap: 4px; }
-  mdui-dropdown { display: none; }
-  mdui-menu:not(:defined) { display: none; }
 
   /* 区块 */
   section { padding: 64px 0; scroll-margin-top: calc(var(--bar-height) + 12px); }
@@ -174,6 +172,8 @@
     .section-sub { font-size: 13px; margin-bottom: 28px; }
     mdui-card { padding: 20px; }
     .banner { font-size: 12px; }
+    /* 顶栏空间有限：注册本身是关闭态，窄屏收进公告文案里 */
+    #btn-register { display: none; }
   }
 
   footer {
@@ -187,7 +187,6 @@
 
   @media (max-width: 900px) {
     .nav-links { display: none; }
-    mdui-dropdown { display: block; }
     .model-groups, .feature-grid { grid-template-columns: 1fr; }
     .hero h1 { font-size: 30px; }
     .hero { padding: 56px 0 40px; }
@@ -208,14 +207,6 @@
     <mdui-button variant="text" id="nav-announce">公告</mdui-button>
   </div>
   <div style="flex-grow: 1"></div>
-  <mdui-dropdown>
-    <mdui-button-icon slot="trigger" icon="more_vert"></mdui-button-icon>
-    <mdui-menu>
-      <mdui-menu-item href="#models">模型</mdui-menu-item>
-      <mdui-menu-item href="#features">服务优势</mdui-menu-item>
-      <mdui-menu-item id="menu-announce">公告</mdui-menu-item>
-    </mdui-menu>
-  </mdui-dropdown>
   <mdui-button-icon id="btn-theme" icon="light_mode"></mdui-button-icon>
   <mdui-button variant="text" href="/login" id="btn-login">登录</mdui-button>
   <mdui-button variant="tonal" id="btn-register">注册</mdui-button>
@@ -396,7 +387,6 @@
   var maintainDialog = document.getElementById("maintain-dialog");
   function openMaintain() { maintainDialog.open = true; }
   document.getElementById("nav-announce").addEventListener("click", openMaintain);
-  document.getElementById("menu-announce").addEventListener("click", openMaintain);
   document.getElementById("modal-close").addEventListener("click", function () {
     maintainDialog.open = false;
   });

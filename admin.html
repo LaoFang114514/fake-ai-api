@@ -58,28 +58,17 @@
     color: rgb(var(--mdui-color-on-surface-variant));
   }
   .login-card mdui-text-field { display: block; width: 100%; margin-bottom: 16px; }
-  .captcha-row { display: flex; align-items: flex-end; gap: 12px; }
-  .captcha-row mdui-text-field { flex: 1; }
+  .captcha-row { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 16px; }
+  .captcha-row mdui-text-field { flex: 1; margin-bottom: 0; }
   .captcha-box {
+    box-sizing: border-box;
     display: flex; align-items: center; gap: 6px;
-    height: 56px; padding: 0 14px;
-    border-radius: var(--mdui-shape-corner-small);
-    border: 1px solid rgb(var(--mdui-color-outline));
-    font-family: "SF Mono", Consolas, Menlo, monospace;
-    font-size: 17px; font-weight: 700; letter-spacing: 2px;
-    color: rgb(var(--mdui-color-on-surface));
-    background: rgb(var(--mdui-color-surface-container-high));
-    user-select: none; cursor: pointer; white-space: nowrap;
+    height: 56px;
   }
   .login-row {
     display: flex; align-items: center; justify-content: space-between;
     font-size: 13px; margin: 2px 0 20px;
     color: rgb(var(--mdui-color-on-surface-variant));
-  }
-  .login-foot {
-    margin-top: 22px; padding-top: 18px;
-    border-top: 1px solid rgb(var(--mdui-color-outline-variant));
-    display: flex; gap: 10px; justify-content: center;
   }
   .login-tip { text-align: center; font-size: 12px; margin-top: 16px; color: rgb(var(--mdui-color-on-surface-variant)); }
   .login-version { text-align: center; font-size: 12px; margin-top: 18px; color: rgb(var(--mdui-color-on-surface-variant)); opacity: .75; }
@@ -368,9 +357,10 @@
     .mask-note .box { padding: 14px 16px; }
     .mask-note .desc { max-width: 250px; }
     mdui-dialog { padding: 12px; }
+    /* 顶栏元素过多会被裁切：侧栏已有充值与账号信息，这里只留菜单/标题/主题 */
+    .chip-status, .topbar .tag.mut, #btn-quick-topup, .topbar mdui-avatar { display: none; }
   }
   @media (max-width: 380px) {
-    .topbar .tag.mut, .chip-status { display: none; }
     .call-url { flex-wrap: wrap; }
   }
 </style>
@@ -401,9 +391,6 @@
 
     <mdui-button id="btn-login" variant="filled" full-width>登 录</mdui-button>
 
-    <div class="login-foot">
-      <mdui-button variant="tonal" icon="tag" id="btn-oauth">使用邀请码登录</mdui-button>
-    </div>
     <div class="login-tip">连续 5 次失败将锁定账号 15 分钟</div>
     <div class="login-version">nb-ai v1.7.2 · 服务器时区 UTC+8</div>
   </mdui-card>
@@ -884,9 +871,6 @@
   document.getElementById("link-forget").addEventListener("click", function (e) {
     e.preventDefault();
     notify("请联系管理员重置密码：114514@laofang.top");
-  });
-  document.getElementById("btn-oauth").addEventListener("click", function () {
-    notify("邀请码通道已关闭");
   });
 
   /* ---------- 视图切换 ---------- */
